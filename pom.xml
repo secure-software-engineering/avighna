@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>de.fraunhofer.iem</groupId>
+    <artifactId>hybridCG</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <soot-version>4.3.0-SNAPSHOT</soot-version>
+        <java-assist-version>3.28.0-GA</java-assist-version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>soot-snapshot</id>
+            <name>soot snapshot</name>
+            <url>https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-snapshot/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>soot-release</id>
+            <name>soot release</name>
+            <url>https://soot-build.cs.uni-paderborn.de/nexus/repository/soot-release/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <modules>
+        <module>hybridCG-merger</module>
+        <module>dynamic-cg-generator</module>
+    </modules>
+</project>
