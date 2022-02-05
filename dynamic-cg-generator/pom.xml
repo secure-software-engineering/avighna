@@ -31,8 +31,8 @@
         </dependency>
         <dependency>
             <groupId>de.fraunhofer.iem</groupId>
-            <artifactId>HybridCG</artifactId>
-            <version>${project.parent.version}</version>
+            <artifactId>hybridCG-merger</artifactId>
+            <version>${current-version}</version>
         </dependency>
     </dependencies>
 
