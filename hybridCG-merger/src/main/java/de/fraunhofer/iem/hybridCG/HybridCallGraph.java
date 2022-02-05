@@ -13,6 +13,8 @@ public class HybridCallGraph {
             System.out.println("*******************************");
             System.out.println("Source: " + directedEdge.getSource());
             System.out.println("Destination: " + directedEdge.getDestination());
+            System.out.println("Associated Library call: " + directedEdge.getAssociatedCallSite());
+            System.out.println("Line number: " + directedEdge.getAssociatedCallSiteLineNumber());
             System.out.println("isFakeEdge: " + directedEdge.isFakeEdge());
             System.out.println("isCallSiteSameAsCaller: " + directedEdge.isCallSiteSameAsCaller());
             System.out.println("*******************************");
@@ -21,6 +23,7 @@ public class HybridCallGraph {
     }
 
     private static SootMethod getMethod(String methodSignature) {
+
         return null;
     }
 
