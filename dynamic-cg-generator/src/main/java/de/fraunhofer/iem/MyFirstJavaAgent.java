@@ -34,33 +34,42 @@ public class MyFirstJavaAgent implements ClassFileTransformer {
         exclude.add("de/fraunhofer/iem/DynamicCGStack");
         exclude.add("de/fraunhofer/iem/DynamicCallStack");
         exclude.add("de/fraunhofer/iem/DynamicCallStackManager");
-        exclude.add("sun/");
-        exclude.add("org/springframework/boot/loader/");
-        exclude.add("ch/qos/logback/");
-        exclude.add("org/slf4j/");
-        exclude.add("org/springframework/util/StringUtils");
-        exclude.add("org/springframework/util/Assert");
-        exclude.add("org/springframework/util/");
-        exclude.add("org/springframework/util/");
-        exclude.add("org/apache/commons/logging/");
+        exclude.add("de/fraunhofer/iem/DynamicCGAgent");
+        exclude.add("de/fraunhofer/iem/CallType");
+        exclude.add("de/fraunhofer/iem/MyFirstJavaAgent");
+        exclude.add("de/fraunhofer/iem/hybridCG/HybridCallGraph");
+        exclude.add("de/fraunhofer/iem/util/DirectedEdge");
+        exclude.add("de/fraunhofer/iem/util/EdgesInAGraph");
+        exclude.add("de/fraunhofer/iem/util/FakeSerializableDotGraph");
+        exclude.add("de/fraunhofer/iem/util/SerializableDotGraph");
+        exclude.add("de/fraunhofer/iem/util/SerializableUtility");
+        //    exclude.add("sun/");
+        //    exclude.add("org/springframework/boot/loader/");
+        //    exclude.add("ch/qos/logback/");
+        //    exclude.add("org/slf4j/");
+        //    exclude.add("org/springframework/util/StringUtils");
+        //    exclude.add("org/springframework/util/Assert");
+        //    exclude.add("org/springframework/util/");
+        //    exclude.add("org/springframework/util/");
+        //    exclude.add("org/apache/commons/logging/");
         exclude.add("de/fraunhofer/iem/springbench/bean/configurations/MyConfiguration$$EnhancerBySpringCGLIB");
-    //    exclude.add("java/nio/");
-   //     exclude.add("org/springframework/boot/loader");
-    //    exclude.add("sun/invoke");
-   //     exclude.add("org/springframework/util");
-   //     exclude.add("org/springframework/core/annotation/AnnotationUtils");
-   //     exclude.add("ch/qos/logback");
-   //     exclude.add("org/springframework/asm");
-   //     exclude.add("org/apache/");
-   //     exclude.add("com/sun/");
-   //     exclude.add("org/springframework/core/MethodClassKey");
-   //     exclude.add("org/springframework/boot");
-   //     exclude.add("org/springframework/core");
-   //     exclude.add("org/hibernate");
-   //     exclude.add("org/hsqldb");
-   //     exclude.add("antlr");
-   //     exclude.add("jdk");
-   //     exclude.add("org/thymeleaf");
+        //    exclude.add("java/nio/");
+        //     exclude.add("org/springframework/boot/loader");
+        //    exclude.add("sun/invoke");
+        //     exclude.add("org/springframework/util");
+        //     exclude.add("org/springframework/core/annotation/AnnotationUtils");
+        //     exclude.add("ch/qos/logback");
+        //     exclude.add("org/springframework/asm");
+        //     exclude.add("org/apache/");
+        //     exclude.add("com/sun/");
+        //     exclude.add("org/springframework/core/MethodClassKey");
+        //     exclude.add("org/springframework/boot");
+        //     exclude.add("org/springframework/core");
+        //     exclude.add("org/hibernate");
+        //     exclude.add("org/hsqldb");
+        //     exclude.add("antlr");
+        //     exclude.add("jdk");
+        //     exclude.add("org/thymeleaf");
 
         controller.add("initCreationForm");
         controller.add("processCreationForm");
@@ -73,35 +82,37 @@ public class MyFirstJavaAgent implements ClassFileTransformer {
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         //System.out.println("ClassName = " + className);
 
-  //      if (className.equals(beginClass)) {
-    //        return enhanceClass(className, classfileBuffer);
-      //  }
+        //      if (className.equals(beginClass)) {
+        //        return enhanceClass(className, classfileBuffer);
+        //  }
 
 
-    //    System.out.println("Transform = " + className);
+        //    System.out.println("Transform = " + className);
 
-        if (className.startsWith(this.applicationRootPackage)) {
-        //    isEnhance = true;
-            for (String excludeString : exclude) {
-                if (className.startsWith(excludeString)) {
-                    if (className.contains("DynamicCG")) {
-                        System.out.println("Excluding = " + className);
-                    }
-
-            //        System.out.println("Returning 3");
-                    return classfileBuffer;
+        for (String excludeString : exclude) {
+            if (className.startsWith(excludeString)) {
+                if (className.contains("DynamicCG")) {
+                    System.out.println("Excluding = " + className);
                 }
-            }
 
-         //   System.out.println("Returning 1");
-            return enhanceClass(className, classfileBuffer);
+                //        System.out.println("Returning 3");
+                return classfileBuffer;
+            }
         }
 
-      //  System.out.println("Returning 2");
-        return classfileBuffer;
+        if (className.startsWith(this.applicationRootPackage)) {
+            //    isEnhance = true;
+
+            //   System.out.println("Returning 1");
+            return enhanceClass(className, classfileBuffer, false);
+        } else {
+            //  System.out.println("Returning 2");
+            return enhanceClass(className, classfileBuffer, true);
+        }
     }
 
-    private byte[] enhanceClass(String className, byte[] classfileBuffer) {
+    private byte[] enhanceClass(String className, byte[] classfileBuffer, boolean isLibraryCall) {
+        String currentlyProcessingMethod = "";
         ClassPool pool = ClassPool.getDefault();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         pool.insertClassPath(new LoaderClassPath(cl));
@@ -112,12 +123,14 @@ public class MyFirstJavaAgent implements ClassFileTransformer {
             if (!clazz.isInterface()) {
                 CtMethod[] methodss = clazz.getDeclaredMethods();
                 for (CtMethod method : methodss) {
+                    currentlyProcessingMethod = method.getLongName();
+                    if (!method.isEmpty()) {
 //                    if (className.startsWith("org/springframework/samples/petclinic/owner/OwnerController")) {
-  //                      System.out.println("\n\n\n" + method.getSignature() + "\n\n\n");
-    //                    System.out.println("\n\n\n" + method.getGenericSignature() + "\n\n\n");
-      //                  System.out.println("\n\n\n" + className + "\n\n\n");
-        //                System.out.println("\n\n\n" + clazz.getName() + "\n\n\n");
-  //                  }
+                        //                      System.out.println("\n\n\n" + method.getSignature() + "\n\n\n");
+                        //                    System.out.println("\n\n\n" + method.getGenericSignature() + "\n\n\n");
+                        //                  System.out.println("\n\n\n" + className + "\n\n\n");
+                        //                System.out.println("\n\n\n" + clazz.getName() + "\n\n\n");
+                        //                  }
                    /* String beforeCode = "try {\n" +
                             "  \n" +
                             "            java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.FileWriter(\"stats.txt\", true));\n" +
@@ -129,15 +142,18 @@ public class MyFirstJavaAgent implements ClassFileTransformer {
                             "        }";
 */
 
-                    if (clazz.getName().startsWith("org.springframework.util.StringUtils")) {
-                        Scanner reader = new Scanner(System.in);  // Reading from System.in
-                        System.out.println("Enter a number: ");
-                        int n = reader.nextInt();
-                    }
+//                    if (clazz.getName().startsWith("org.springframework.util.StringUtils")) {
+//                        Scanner reader = new Scanner(System.in);  // Reading from System.in
+//                        System.out.println("Enter a number: ");
+//                        int n = reader.nextInt();
+//                    }
 
-                    String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + clazz.getName() + "." + method.getName() + "\");";
+                        String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\""
+                                + method.getLongName() +
+                                "\"," + isLibraryCall + ");";
 
-             //       String beforeCode = "de.fraunhofer.iem.DynamicCGStack.getStackTrace();";
+
+                        //       String beforeCode = "de.fraunhofer.iem.DynamicCGStack.getStackTrace();";
 /*
                     if (clazz.getName().contains("org/springframework/samples/petclinic")) {
                         System.out.println("\n\n\n" + method.getName() + "\n\n\n");
@@ -149,7 +165,8 @@ public class MyFirstJavaAgent implements ClassFileTransformer {
                                 "de.fraunhofer.iem.DynamicCGStack.printStackTrace()";
                     }
 */
-                    method.insertBefore(beforeCode);
+
+                        method.insertBefore(beforeCode);
 
                 /*    String afterCode = "try {\n" +
                             "  \n" +
@@ -161,38 +178,41 @@ public class MyFirstJavaAgent implements ClassFileTransformer {
                             "            System.out.println(\"exception occurred\" + e);\n" +
                             "        }";
 */
-                    String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + clazz.getName() + "." + method.getName() + "\");";
 
-    //                if (counter == MAX_COUNTER) {
-      //                  afterCode += "\nde.fraunhofer.iem.DynamicCGStack.printStackTrace();";
-        //                counter = 0;
-          //          } else {
-            //            counter++;
-              //      }
+                        String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\""
+                                + method.getLongName() + "\"," + isLibraryCall + ");";
+                        method.insertAfter(afterCode);
 
-                    method.insertAfter(afterCode);
+                        //                if (counter == MAX_COUNTER) {
+                        //                  afterCode += "\nde.fraunhofer.iem.DynamicCGStack.printStackTrace();";
+                        //                counter = 0;
+                        //          } else {
+                        //            counter++;
+                        //      }
+
+                    }
                 }
 
                 //CtBehavior[] methods = clazz.getDeclaredBehaviors();
 
-            //    System.out.println("\n\n\n ---> " + methods.length + "\n\n\n");
+                //    System.out.println("\n\n\n ---> " + methods.length + "\n\n\n");
 
 //                for (CtBehavior method : methods) {
-  //                  if (!method.isEmpty()) {
-    //                    System.out.println("\n\n\n ---> " + method.getSignature() + "\n\n\n");
-      //              }
-        //        }
+                //                  if (!method.isEmpty()) {
+                //                    System.out.println("\n\n\n ---> " + method.getSignature() + "\n\n\n");
+                //              }
+                //        }
 
                 byteCode = clazz.toBytecode();
             }
         } catch (CannotCompileException | IOException e) {
             try {
 
-                e.printStackTrace();
+                //   e.printStackTrace();
                 // Open given file in append mode.
                 BufferedWriter out = new BufferedWriter(
                         new FileWriter("error.txt", true));
-                out.write(className + " ----- " + e.getClass().getName() + "---" + e.getMessage() + "\n");
+                out.write(currentlyProcessingMethod + " ----- " + e.getClass().getName() + "---" + e.getMessage() + "\n");
                 out.close();
             } catch (IOException ex) {
                 System.out.println("exception occurred" + e);

@@ -19,26 +19,40 @@ public class DynamicCallStackManager {
         return null;
     }
 
-    public static void methodCall(String methodSignature) {
+    public static void methodCall(String methodSignature, boolean isLibraryCall) {
         DynamicCallStack dynamicCallStack = getDynamicCallStack();
 
         if (dynamicCallStack == null) {
+            if (isLibraryCall)
+                return;
+
             dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
             myDynamicCallStack.add(dynamicCallStack);
         }
 
-        dynamicCallStack.methodCall(methodSignature);
+        if (isLibraryCall) {
+            dynamicCallStack.libraryCall(methodSignature);
+        } else {
+            dynamicCallStack.methodCall(methodSignature);
+        }
     }
 
-    public static void methodReturn(String methodSignature) {
+    public static void methodReturn(String methodSignature, boolean isLibraryCall) {
         DynamicCallStack dynamicCallStack = getDynamicCallStack();
 
         if (dynamicCallStack == null) {
+            if (isLibraryCall)
+                return;
+
             dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
-            myDynamicCallStack.add(dynamicCallStack);
+     //       myDynamicCallStack.add(dynamicCallStack);
         }
 
-        dynamicCallStack.methodReturn(methodSignature);
+        if (isLibraryCall) {
+            dynamicCallStack.libraryReturnCall(methodSignature);
+        } else {
+            dynamicCallStack.methodReturn(methodSignature);
+        }
     }
 
     public static void writeForcefully() {
