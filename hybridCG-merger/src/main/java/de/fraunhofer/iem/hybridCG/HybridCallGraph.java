@@ -18,9 +18,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class HybridCallGraph {
-    public static CallGraph merge(EdgesInAGraph edgesInAGraph, CallGraph staticCallGraph) {
+    public static CallGraph merge(List<EdgesInAGraph> edgesInAGraphs, CallGraph staticCallGraph) {
 
-        for (DirectedEdge directedEdge : edgesInAGraph.getDirectedEdges()) {
+        for (EdgesInAGraph edgesInAGraph : edgesInAGraphs) {
+            for (DirectedEdge directedEdge : edgesInAGraph.getDirectedEdges()) {
 //            System.out.println("*******************************");
 //            System.out.println("Source: " + directedEdge.getSource());
 //            System.out.println("Destination: " + directedEdge.getDestination());
@@ -30,42 +31,43 @@ public class HybridCallGraph {
 //            System.out.println("isCallSiteSameAsCaller: " + directedEdge.isCallSiteSameAsCaller());
 //            System.out.println("*******************************");
 
-            if (!directedEdge.isFakeEdge()) {
-                SootMethod caller = getMethod(directedEdge.getSource());
-                SootMethod destination = getMethod(directedEdge.getDestination());
-                Stmt associatedCallSiteUnit = getAssociatedCallSiteUnit(
-                        caller,
-                        directedEdge.getAssociatedCallSite(),
-                        directedEdge.getAssociatedCallSiteLineNumber()
-                );
+                if (!directedEdge.isFakeEdge()) {
+                    SootMethod caller = getMethod(directedEdge.getSource());
+                    SootMethod destination = getMethod(directedEdge.getDestination());
+                    List<Stmt> statements = getAssociatedCallSiteUnit(
+                            caller,
+                            directedEdge.getAssociatedCallSite(),
+                            directedEdge.getAssociatedCallSiteLineNumber());
 
-                boolean isEdgeFound = false;
+                    for (Stmt associatedCallSiteUnit : statements) {
+                        boolean isEdgeFound = false;
 
 //                System.out.println(staticCallGraph);
-                try {
-                    for (Iterator<Edge> it = staticCallGraph.edgesOutOf(associatedCallSiteUnit); it.hasNext(); ) {
-                        Edge edge = it.next();
+                        try {
+                            for (Iterator<Edge> it = staticCallGraph.edgesOutOf(associatedCallSiteUnit); it.hasNext(); ) {
+                                Edge edge = it.next();
 
-                        if (edge.getSrc().method().getSignature().equals(caller.getSignature())) {
-                            if (edge.getTgt().method().getSignature().equals(destination.getSignature())) {
-                                System.out.println("Found = " + edge.getSrc().method().getSignature() +
-                                        " : " + edge.getTgt().method().getSignature());
+                                if (edge.getSrc().method().getSignature().equals(caller.getSignature())) {
+                                    if (edge.getTgt().method().getSignature().equals(destination.getSignature())) {
+                                        System.out.println("Found = " + edge.getSrc().method().getSignature() + " : " + edge.getTgt().method().getSignature());
 
-                                isEdgeFound = true;
+                                        isEdgeFound = true;
+                                    }
+                                }
                             }
+                        } catch (Exception | Error e) {
+                            e.printStackTrace();
+                        }
+
+                        if (!isEdgeFound) {
+                            Edge edge = new Edge(caller, associatedCallSiteUnit, destination);
+
+                            staticCallGraph.addEdge(edge);
                         }
                     }
-                } catch (Exception | Error e) {
-                    e.printStackTrace();
                 }
-
-                if (!isEdgeFound) {
-                    Edge edge = new Edge(caller, associatedCallSiteUnit, destination);
-
-                    staticCallGraph.addEdge(edge);
-                }
-            }
 //            Unit associatedCallSite =
+            }
         }
 
         generateDotGraph();
@@ -77,21 +79,16 @@ public class HybridCallGraph {
         CallGraph callGraph = Scene.v().getCallGraph();
 
         DotGraph dot = new DotGraph("final:callgraph");
-        Iterator<Edge> iteratorEdges = callGraph.iterator();
 
-        while (iteratorEdges.hasNext()) {
-            Edge edge = iteratorEdges.next();
+        for (Edge edge : callGraph) {
             String node_src = edge.getSrc().toString();
             String node_tgt = edge.getTgt().toString();
 
-            if (node_src.startsWith("<java.") || node_tgt.startsWith("<java."))
-                continue;
+            if (node_src.startsWith("<java.") || node_tgt.startsWith("<java.")) continue;
 
-            if (node_src.startsWith("<sun.") || node_tgt.startsWith("<sun."))
-                continue;
+            if (node_src.startsWith("<sun.") || node_tgt.startsWith("<sun.")) continue;
 
-            if (node_src.startsWith("<javax.") || node_tgt.startsWith("<javax."))
-                continue;
+            if (node_src.startsWith("<javax.") || node_tgt.startsWith("<javax.")) continue;
 
 
             DotGraphEdge dotGraphEdge = dot.drawEdge(node_src, node_tgt);
@@ -101,10 +98,9 @@ public class HybridCallGraph {
         dot.plot("callgraph.dot");
     }
 
-    private static Stmt getAssociatedCallSiteUnit(
-            SootMethod caller,
-            String associatedCallSite,
-            int associatedCallSiteLineNumber) {
+    private static List<Stmt> getAssociatedCallSiteUnit(SootMethod caller, String associatedCallSite, int associatedCallSiteLineNumber) {
+        ArrayList<Stmt> statements = new ArrayList<>();
+
         if (caller.hasActiveBody()) {
             Body body = caller.getActiveBody();
 
@@ -115,44 +111,55 @@ public class HybridCallGraph {
                     InvokeExpr invokeExpr = unit.getInvokeExpr();
 
                     SootMethod callSiteMethod = invokeExpr.getMethod();
-                    String methodSignature = callSiteMethod.getSignature();
+                    String methodSignature1 = callSiteMethod.getSignature();
+
+                    String methodNameWithClassName = callSiteMethod.getDeclaringClass().getName() + "." + callSiteMethod.getName();
+
+                    StringBuilder parametersTypes = new StringBuilder("(");
+
+                    if (callSiteMethod.getParameterTypes().size() > 0) {
+                        for (Type type : callSiteMethod.getParameterTypes()) {
+                            parametersTypes.append(type.toString()).append(",");
+                        }
+
+                        parametersTypes.setLength(parametersTypes.length() - 1);
+                    }
+
+                    parametersTypes.append(")");
 
                     if (associatedCallSite.contains("(") && associatedCallSite.contains(")")) {
-                        StringBuilder temp = new StringBuilder(callSiteMethod.getDeclaringClass().getName() + "." +
-                                callSiteMethod.getName() + "(");
+                        String temp = methodNameWithClassName + parametersTypes.toString();
 
-                        if (callSiteMethod.getParameterTypes().size() > 0) {
-                            for (Type type : callSiteMethod.getParameterTypes()) {
-                                temp.append(type.toString()).append(",");
+                        System.out.println("Built Signature = " + temp);
+                        System.out.println("Associated Call Site = " + associatedCallSite);
+                        System.out.println("Line Number = " + associatedCallSiteLineNumber);
+                        System.out.println("Original Signature = " + callSiteMethod.getSignature());
+
+                        if (temp.equals(associatedCallSite)) {
+                            if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
+                                if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
+                                    System.out.println("GOOD NEWS");
+                                    statements.add(unit);
+                                }
+                            } else {
+                                statements.add(unit);
                             }
-
-                            temp.setLength(temp.length() - 1);
                         }
-
-                        temp.append(")");
-
-                        System.out.println(temp);
-                        System.out.println(associatedCallSite);
-                        System.out.println(associatedCallSiteLineNumber);
-
-                        if (temp.toString().equals(associatedCallSite)) {
-                            if (associatedCallSiteLineNumber > 0) {
+                    } else if (methodNameWithClassName.equals(associatedCallSite)) {
+                        if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
+                            if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
                                 System.out.println("GOOD NEWS");
-                                return unit;
+                                statements.add(unit);
                             }
-                        }
-                    } else {
-                        if (methodSignature.contains(associatedCallSite)) {
-                            if (associatedCallSiteLineNumber > 0) {
-                                return unit;
-                            }
+                        } else {
+                            statements.add(unit);
                         }
                     }
                 }
             }
         }
 
-        return null;
+        return statements;
     }
 
     private static SootMethod getMethod(String methodSignature) {
@@ -188,16 +195,24 @@ public class HybridCallGraph {
 
         initializeSoot(appClassPath);
 
-        String filename = "D:\\cgbench\\CGBench\\bean\\target\\dynamic_callgraph_1";
+        List<String> fileNames = new ArrayList<>();
+        List<EdgesInAGraph> edgesInAGraphs = new ArrayList<>();
 
-        EdgesInAGraph edgesInAGraph = SerializableUtility.deSerialize(filename);
+        fileNames.add("D:\\cgbench\\CGBench\\bean\\target\\dynamic_callgraph_18");
+        fileNames.add("D:\\cgbench\\CGBench\\bean\\target\\dynamic_callgraph_1");
 
-        if (edgesInAGraph == null) {
-            System.out.println("NULL");
-            return;
+        for (String filename : fileNames) {
+            EdgesInAGraph edgesInAGraph = SerializableUtility.deSerialize(filename);
+
+            if (edgesInAGraph == null) {
+                System.out.println("ERROR");
+            } else {
+                edgesInAGraphs.add(edgesInAGraph);
+            }
+
         }
 
-        merge(edgesInAGraph, Scene.v().getCallGraph());
+        merge(edgesInAGraphs, Scene.v().getCallGraph());
     }
 
     /**
