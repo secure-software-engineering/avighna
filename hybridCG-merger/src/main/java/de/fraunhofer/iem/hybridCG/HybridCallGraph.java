@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class HybridCallGraph {
-    public static CallGraph merge(List<EdgesInAGraph> edgesInAGraphs, CallGraph staticCallGraph) {
+    public static void merge(List<EdgesInAGraph> edgesInAGraphs, CallGraph staticCallGraph) {
 
         for (EdgesInAGraph edgesInAGraph : edgesInAGraphs) {
             for (DirectedEdge directedEdge : edgesInAGraph.getDirectedEdges()) {
@@ -71,8 +71,6 @@ public class HybridCallGraph {
         }
 
         generateDotGraph();
-
-        return null;
     }
 
     public static void generateDotGraph() {
