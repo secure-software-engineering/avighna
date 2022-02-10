@@ -18,8 +18,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class HybridCallGraph {
-    public static void merge(List<EdgesInAGraph> edgesInAGraphs, CallGraph staticCallGraph) {
+    private static final DotGraph dotGraph = new DotGraph("final:callgraph");
 
+    public static void merge(List<EdgesInAGraph> edgesInAGraphs, CallGraph staticCallGraph) {
+        generateDotGraph();
         for (EdgesInAGraph edgesInAGraph : edgesInAGraphs) {
             for (DirectedEdge directedEdge : edgesInAGraph.getDirectedEdges()) {
 //            System.out.println("*******************************");
@@ -49,6 +51,8 @@ public class HybridCallGraph {
 
                                 if (edge.getSrc().method().getSignature().equals(caller.getSignature())) {
                                     if (edge.getTgt().method().getSignature().equals(destination.getSignature())) {
+                                        //TODO: Should we have to check for line numbers too?
+
                                         System.out.println("Found = " + edge.getSrc().method().getSignature() + " : " + edge.getTgt().method().getSignature());
 
                                         isEdgeFound = true;
@@ -63,6 +67,9 @@ public class HybridCallGraph {
                             Edge edge = new Edge(caller, associatedCallSiteUnit, destination);
 
                             staticCallGraph.addEdge(edge);
+                            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(caller.getSignature(), destination.getSignature());
+                            dotGraphEdge.setLabel(associatedCallSiteUnit.toString());
+                            dotGraphEdge.setAttribute("color", "purple");
                         }
                     }
                 }
@@ -70,13 +77,12 @@ public class HybridCallGraph {
             }
         }
 
-        generateDotGraph();
+        dotGraph.plot("callgraph.dot");
+//        generateDotGraph();
     }
 
     public static void generateDotGraph() {
         CallGraph callGraph = Scene.v().getCallGraph();
-
-        DotGraph dot = new DotGraph("final:callgraph");
 
         for (Edge edge : callGraph) {
             String node_src = edge.getSrc().toString();
@@ -89,11 +95,11 @@ public class HybridCallGraph {
             if (node_src.startsWith("<javax.") || node_tgt.startsWith("<javax.")) continue;
 
 
-            DotGraphEdge dotGraphEdge = dot.drawEdge(node_src, node_tgt);
+            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(node_src, node_tgt);
             dotGraphEdge.setLabel(edge.srcStmt().toString());
 
         }
-        dot.plot("callgraph.dot");
+//        dotGraph.plot("callgraph.dot");
     }
 
     private static List<Stmt> getAssociatedCallSiteUnit(SootMethod caller, String associatedCallSite, int associatedCallSiteLineNumber) {
