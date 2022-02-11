@@ -25,7 +25,7 @@ public class DynamicCallStack {
     private final String outputFile;
     private final StringBuilder currentIndentation = new StringBuilder("");
 
-    private final List<String> continousCallStack;
+    private final List<String> continuousCallStack;
     private final List<String> associatedLibraryCallStack;
     private boolean isAssociatedLibraryCallPresent;
     private final SerializableDotGraph dotGraph;
@@ -41,7 +41,7 @@ public class DynamicCallStack {
         this.pid = pid;
         this.callStack = new ArrayList<>();
         this.outputFile = "stack_" + this.pid + ".txt";
-        this.continousCallStack = new ArrayList<>();
+        this.continuousCallStack = new ArrayList<>();
         this.associatedLibraryCallStack = new ArrayList<>();
         this.isAssociatedLibraryCallPresent = false;
         this.dotGraph = new SerializableDotGraph();
@@ -66,7 +66,7 @@ public class DynamicCallStack {
                 associatedLibraryCallStack.remove(associatedLibraryCallStack.size() - 1);
                 isAssociatedLibraryCallPresent = false;
                 System.out.println("*** Library Return Call ***");
-                System.out.println("CS = " + continousCallStack);
+                System.out.println("CS = " + continuousCallStack);
                 System.out.println("LCS = " + associatedLibraryCallStack);
                 System.out.println("*** Library Return Call ***");
             }
@@ -78,12 +78,12 @@ public class DynamicCallStack {
             System.out.println("OK ENTERED");
         }
 
-        if (!isAssociatedLibraryCallPresent && this.continousCallStack.size() != 0) {
+        if (!isAssociatedLibraryCallPresent && this.continuousCallStack.size() != 0) {
             if (methodSignature.contains("org.springframework.context.support.refresh")) {
                 System.out.println("OK ENTERED");
             }
             StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-            String sourceNode = this.continousCallStack.get(this.continousCallStack.size() - 1);
+            String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
 
             if (stackTraceElements.length > 5) {
                 if (methodSignature.contains("org.springframework.context.support.refresh")) {
@@ -100,7 +100,7 @@ public class DynamicCallStack {
                         this.associatedLibraryCallStack.add(methodSignature);
                         isAssociatedLibraryCallPresent = true;
                         System.out.println("*** Library Call ***");
-                        System.out.println("CS = " + continousCallStack);
+                        System.out.println("CS = " + continuousCallStack);
                         System.out.println("LCS = " + associatedLibraryCallStack);
                         System.out.println("*** Library Call ***");
                     }
@@ -140,15 +140,15 @@ public class DynamicCallStack {
      * @param methodSignature Method signature
      */
     public void methodCall(String methodSignature) {
-        if (this.continousCallStack.size() == 0) {
-            this.continousCallStack.add(methodSignature);
+        if (this.continuousCallStack.size() == 0) {
+            this.continuousCallStack.add(methodSignature);
             System.out.println("*** Application Call ***");
-            System.out.println("CS = " + continousCallStack);
+            System.out.println("CS = " + continuousCallStack);
             System.out.println("LCS = " + associatedLibraryCallStack);
             System.out.println("*** Application Call ***");
 
         } else {
-            String sourceNode = this.continousCallStack.get(this.continousCallStack.size() - 1);
+            String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
             String associatedLibraryCall = null;
             DotGraphEdge dotGraphEdge = null;
             boolean isFakeEdge = false;
@@ -217,9 +217,9 @@ public class DynamicCallStack {
                 dotGraphEdge.setAttribute("color", "red");
             }
 
-            this.continousCallStack.add(methodSignature);
+            this.continuousCallStack.add(methodSignature);
             System.out.println("*** Application Call ***");
-            System.out.println("CS = " + continousCallStack);
+            System.out.println("CS = " + continuousCallStack);
             System.out.println("LCS = " + associatedLibraryCallStack);
             System.out.println("*** Application Call ***");
         }
@@ -254,7 +254,7 @@ public class DynamicCallStack {
      * @param methodSignature Method signature
      */
     public void methodReturn(String methodSignature) {
-        if (this.continousCallStack.size() == 1) {
+        if (this.continuousCallStack.size() == 1) {
             File dotFile = new File("dynamic_callgraph_" + this.pid + ".dot");
             if (dotFile.exists()) {
                 dotFile.delete();
@@ -262,16 +262,16 @@ public class DynamicCallStack {
 
             dotGraph.plot("dynamic_callgraph_" + this.pid + ".dot");
 
-            this.continousCallStack.remove(this.continousCallStack.size() - 1);
+            this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
 
             SerializableUtility.serialize(edgesInAGraph, "dynamic_callgraph_" + this.pid);
         } else {
-            this.continousCallStack.remove(this.continousCallStack.size() - 1);
+            this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
         }
 
         System.out.println("*** Return Call ***");
-        System.out.println("CS = " + continousCallStack);
+        System.out.println("CS = " + continuousCallStack);
         System.out.println("LCS = " + associatedLibraryCallStack);
         System.out.println("*** Return Call ***");
     }
