@@ -12,12 +12,12 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyFirstJavaAgent implements ClassFileTransformer {
+public class AgentTransformer implements ClassFileTransformer {
     private static final List<String> exclude = new ArrayList<>();
 
     private final String applicationRootPackage;
 
-    public MyFirstJavaAgent(String applicationRootPackage) {
+    public AgentTransformer(String applicationRootPackage) {
         this.applicationRootPackage = applicationRootPackage;
     }
 

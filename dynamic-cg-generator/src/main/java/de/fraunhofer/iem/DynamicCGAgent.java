@@ -45,7 +45,7 @@ public class DynamicCGAgent {
 
         System.out.print("Enter the application's root package: ");
         String applicationRootPackage = new Scanner(System.in).next().replaceAll("\\.", "/") + "/";
-        instrumentation.addTransformer(new MyFirstJavaAgent(applicationRootPackage));
+        instrumentation.addTransformer(new AgentTransformer(applicationRootPackage));
     }
 
     public static void agentmain(String argument, Instrumentation instrumentation) {
