@@ -3,7 +3,7 @@ package de.fraunhofer.iem.hybridCG;
 import java.io.File;
 
 /**
- * Utility class for the Command Line argument parser
+ * //TODO: Remove this after testing
  *
  * @author Ranjith Krishnamurthy
  */
