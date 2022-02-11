@@ -23,8 +23,7 @@ public class DynamicCallStackManager {
         DynamicCallStack dynamicCallStack = getDynamicCallStack();
 
         if (dynamicCallStack == null) {
-            if (isLibraryCall)
-                return;
+            if (isLibraryCall) return;
 
             dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
             myDynamicCallStack.add(dynamicCallStack);
@@ -41,11 +40,9 @@ public class DynamicCallStackManager {
         DynamicCallStack dynamicCallStack = getDynamicCallStack();
 
         if (dynamicCallStack == null) {
-            if (isLibraryCall)
-                return;
+            if (isLibraryCall) return;
 
             dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
-     //       myDynamicCallStack.add(dynamicCallStack);
         }
 
         if (isLibraryCall) {

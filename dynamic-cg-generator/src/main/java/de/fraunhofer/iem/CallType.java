@@ -6,6 +6,5 @@ package de.fraunhofer.iem;
  * @author Ranjith Krishnamurthy
  */
 public enum CallType {
-    MethodCall,
-    ReturnCall
+    MethodCall, ReturnCall
 }

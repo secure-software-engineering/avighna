@@ -5,7 +5,6 @@ import de.fraunhofer.iem.util.DirectedEdge;
 import de.fraunhofer.iem.util.EdgesInAGraph;
 import de.fraunhofer.iem.util.SerializableDotGraph;
 import de.fraunhofer.iem.util.SerializableUtility;
-import soot.util.dot.DotGraph;
 import soot.util.dot.DotGraphEdge;
 
 import java.io.*;
@@ -90,10 +89,8 @@ public class DynamicCallStack {
                 if (methodSignature.contains("org.springframework.context.support.refresh")) {
                     System.out.println("OK ENTERED");
                 }
-                String calledLibraryMethod = stackTraceElements[3].getClassName() + "." +
-                        stackTraceElements[3].getMethodName();
-                String methodThatCalledLibraryMethod = stackTraceElements[4].getClassName() + "." +
-                        stackTraceElements[4].getMethodName();
+                String calledLibraryMethod = stackTraceElements[3].getClassName() + "." + stackTraceElements[3].getMethodName();
+                String methodThatCalledLibraryMethod = stackTraceElements[4].getClassName() + "." + stackTraceElements[4].getMethodName();
 
                 if (methodSignature.startsWith(calledLibraryMethod + "(")) {
                     if (methodSignature.contains("org.springframework.context.support.refresh")) {
@@ -179,8 +176,7 @@ public class DynamicCallStack {
 //                destinationNode = methodSignature + " : -1[]";
 //            }
 
-            if (isFakeEdge(methodSignature))
-                isFakeEdge = true;
+            if (isFakeEdge(methodSignature)) isFakeEdge = true;
             else if (isFakeEdge(sourceNode)) {
                 isFakeEdge = true;
             }
@@ -210,14 +206,11 @@ public class DynamicCallStack {
 //                this.associatedLibraryCallStack.add("NA");
             }
 
-            edgesInAGraph.addDirectedEdge(new DirectedEdge(
-                    sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller
-            ));
+            edgesInAGraph.addDirectedEdge(new DirectedEdge(sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller));
 
             dotGraphEdge.setLabel(lineNumber + "[" + associatedLibraryCall + "]");
 
-            if (!isCallSiteSameAsCaller)
-                dotGraphEdge.setAttribute("color", "red");
+            if (!isCallSiteSameAsCaller) dotGraphEdge.setAttribute("color", "red");
 
             if (isFakeEdge) {
                 dotGraphEdge.setStyle("dashed");
@@ -283,11 +276,9 @@ public class DynamicCallStack {
         System.out.println("*** Return Call ***");
     }
 
-    private String readFromInputStream(InputStream inputStream)
-            throws IOException {
+    private String readFromInputStream(InputStream inputStream) throws IOException {
         StringBuilder resultStringBuilder = new StringBuilder();
-        try (BufferedReader br
-                     = new BufferedReader(new InputStreamReader(inputStream))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             while ((line = br.readLine()) != null) {
                 resultStringBuilder.append(line).append("\n");
@@ -310,12 +301,7 @@ public class DynamicCallStack {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(this.outputFile, true));
 
-            writer.write(
-                    "\n" +
-                            String.valueOf(callStack)
-                                    .replaceAll(", ", "\n")
-                                    .replaceAll("\\[", "")
-                                    .replaceAll("]", ""));
+            writer.write("\n" + String.valueOf(callStack).replaceAll(", ", "\n").replaceAll("\\[", "").replaceAll("]", ""));
             writer.close();
 
         } catch (IOException e) {

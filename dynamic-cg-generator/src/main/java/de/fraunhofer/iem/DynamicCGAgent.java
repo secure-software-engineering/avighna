@@ -24,7 +24,6 @@ public class DynamicCGAgent {
             File file = new File(fileName);
             FileWriter fileWriter = new FileWriter(file);
 
-            //System.out.println(file.getAbsolutePath());
             BufferedWriter out = new BufferedWriter(fileWriter);
             out.write("Dynamic Call Stack:\n");
             out.close();
@@ -37,7 +36,6 @@ public class DynamicCGAgent {
             File file = new File(fileName);
             FileWriter fileWriter = new FileWriter(file);
 
-            //System.out.println(file.getAbsolutePath());
             BufferedWriter out = new BufferedWriter(fileWriter);
             out.write("Dynamic Call Stack (ERROR):\n");
             out.close();
@@ -46,18 +44,8 @@ public class DynamicCGAgent {
         }
 
         System.out.print("Enter the application's root package: ");
-        String applicationRootPackage = new Scanner(System.in).
-                next().
-                replaceAll("\\.", "/") + "/";
+        String applicationRootPackage = new Scanner(System.in).next().replaceAll("\\.", "/") + "/";
         instrumentation.addTransformer(new MyFirstJavaAgent(applicationRootPackage));
-/*
-        for (Class cls : instrumentation.getAllLoadedClasses()) {
-            try {
-                instrumentation.retransformClasses(cls);
-            } catch (UnmodifiableClassException e) {
-                System.out.println("Cant transform: " + cls.getName());
-            }
-        }*/
     }
 
     public static void agentmain(String argument, Instrumentation instrumentation) {
