@@ -2,3 +2,5 @@
 target/
 *.iml
 *.dot
+*.png
+*.svg
