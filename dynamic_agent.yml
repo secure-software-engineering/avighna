@@ -1,0 +1,10 @@
+rootPackageNameOfApplication: 'de.fraunhofer.iem.springbench.bean'
+outputRootDirectory: 'D:\cgbench\CGBench\bean\output\'
+saveCallGraphAsDotFile: true
+saveCallGraphAsImage: true
+excludeClasses:
+  - 'java/'
+  - 'de/fraunhofer/iem/springbench/bean/configurations/MyConfiguration$$EnhancerBySpringCGLIB'
+fakeEdgesString:
+  - '$$EnhancerBySpringCGLIB$$'
+  - '$$FastClassBySpringCGLIB$$'
