@@ -12,6 +12,11 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This transformer instrument the code to generate Dynamic CG
+ *
+ * @author Ranjith Krishnamurthy
+ */
 public class AgentTransformer implements ClassFileTransformer {
     private static final List<String> exclude = new ArrayList<>();
 
