@@ -16,16 +16,18 @@ public class LoggerUtil {
 
     public static Logger getLOGGER() {
         if (LOGGER == null) {
-            LoggerUtil.LOGGER = Logger.getLogger(DynamicCallStackManager.class.getName());
+            LOGGER = Logger.getLogger(DynamicCallStackManager.class.getName());
 
-            LoggerUtil.LOGGER.setUseParentHandlers(false);
+            LOGGER.setUseParentHandlers(false);
 
-            ConsoleHandler handler = new ConsoleHandler();
+            if (LOGGER.getHandlers().length == 0) {
+                ConsoleHandler handler = new ConsoleHandler();
 
-            Formatter formatter = new LogFormatter();
-            handler.setFormatter(formatter);
+                Formatter formatter = new LogFormatter();
+                handler.setFormatter(formatter);
 
-            LoggerUtil.LOGGER.addHandler(handler);
+                LoggerUtil.LOGGER.addHandler(handler);
+            }
         }
 
         return LOGGER;
