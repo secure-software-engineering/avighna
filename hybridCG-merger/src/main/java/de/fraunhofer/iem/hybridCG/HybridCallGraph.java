@@ -279,8 +279,8 @@ public class HybridCallGraph {
         List<String> fileNames = new ArrayList<>();
         List<EdgesInAGraph> edgesInAGraphs = new ArrayList<>();
 
-        fileNames.add("D:\\cgbench\\CGBench\\bean\\target\\dynamic_callgraph_18");
-        fileNames.add("D:\\cgbench\\CGBench\\bean\\target\\dynamic_callgraph_1");
+        fileNames.add("D:\\cgbench\\CGBench\\bean\\output\\dynamic_callgraph_1");
+        fileNames.add("D:\\cgbench\\CGBench\\bean\\output\\dynamic_callgraph_18");
 
         for (String filename : fileNames) {
             EdgesInAGraph edgesInAGraph = SerializableUtility.deSerialize(filename);
