@@ -30,7 +30,10 @@ public class DynamicCallStack {
     private boolean isAssociatedLibraryCallPresent;
     private final SerializableDotGraph dotGraph;
     private final EdgesInAGraph edgesInAGraph;
-    private final Set<String> fakeEdges = new HashSet<>();
+    public static final Set<String> fakeEdges = new HashSet<>();
+    public static String outputRootDirectory;
+    public static boolean saveCallGraphAsDotFile;
+    public static boolean saveCallGraphAsImage;
 
     /**
      * Initializes the stack
@@ -40,15 +43,13 @@ public class DynamicCallStack {
     public DynamicCallStack(long pid) {
         this.pid = pid;
         this.callStack = new ArrayList<>();
-        this.outputFile = "stack_" + this.pid + ".txt";
+        this.outputFile = outputRootDirectory +
+                System.getProperty("file.separator") + "stack_" + this.pid + ".txt";
         this.continuousCallStack = new ArrayList<>();
         this.associatedLibraryCallStack = new ArrayList<>();
         this.isAssociatedLibraryCallPresent = false;
         this.dotGraph = new SerializableDotGraph();
         this.edgesInAGraph = new EdgesInAGraph("callgraph", dotGraph);
-
-        fakeEdges.add("$$EnhancerBySpringCGLIB$$");
-        fakeEdges.add("$$FastClassBySpringCGLIB$$");
     }
 
     /**

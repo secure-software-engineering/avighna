@@ -103,6 +103,11 @@ public class DynamicCGAgent {
                 .replaceAll(", ", "\n")
                 .replaceAll("]", ""));
 
+        DynamicCallStack.outputRootDirectory = dynamicAgentConfiguration.getOutputRootDirectory();
+        DynamicCallStack.fakeEdges.addAll(dynamicAgentConfiguration.getFakeEdgesString());
+        DynamicCallStack.saveCallGraphAsDotFile = dynamicAgentConfiguration.isSaveCallGraphAsDotFile();
+        DynamicCallStack.saveCallGraphAsImage = dynamicAgentConfiguration.isSaveCallGraphAsImage();
+
         LoggerUtil.getLOGGER().info("Instrumentation begins");
         instrumentation.addTransformer(new AgentTransformer(applicationRootPackage, dynamicAgentConfiguration.getExcludeClasses()));
     }
