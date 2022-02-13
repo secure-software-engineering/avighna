@@ -1,8 +1,10 @@
 package de.fraunhofer.iem.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.logging.Formatter;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 /**
@@ -27,10 +29,25 @@ public class LogFormatter extends Formatter {
         builder.append(generateDataAndTime(record.getMillis()));
         builder.append(ANSI_RESET);
 
-        builder.append(ANSI_GREEN);
+        Level level = record.getLevel();
+
+        if (level == Level.SEVERE) {
+            builder.append(ANSI_RED);
+        } else if (level == Level.WARNING) {
+            builder.append(ANSI_YELLOW);
+        } else {
+            builder.append(ANSI_GREEN);
+        }
+
         builder.append(" ");
         builder.append(record.getLevel().getName());
-        builder.append(" ");
+        builder.append(
+                Collections
+                        .nCopies(8 - level.toString().length(), "")
+                        .toString()
+                        .replaceAll("\\[", "")
+                        .replaceAll("]", "")
+                        .replaceAll(",", ""));
         builder.append(ANSI_RESET);
 
         builder.append(" [");
@@ -41,7 +58,7 @@ public class LogFormatter extends Formatter {
 
         builder.append("]");
 
-        builder.append(ANSI_YELLOW);
+        builder.append(ANSI_PURPLE);
         builder.append("(").append(record.getSourceClassName()).append(")");
         builder.append(ANSI_RESET);
 
