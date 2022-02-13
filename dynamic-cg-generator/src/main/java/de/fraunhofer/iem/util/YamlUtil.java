@@ -24,21 +24,13 @@ public class YamlUtil {
         try {
             InputStream inputStream = new FileInputStream(yamlFileName);
             Yaml yaml = new Yaml(new Constructor(DynamicAgentConfiguration.class));
-            DynamicAgentConfiguration data = yaml.load(inputStream);
 
-//            System.out.println(data.getRootPackageNameOfApplication());
-//            System.out.println(data.getOutputRootDirectory());
-//            System.out.println(data.isSaveCallGraphAsDotFile());
-//            System.out.println(data.isSaveCallGraphAsImage());
-//            System.out.println(data.getExcludeClasses());
-//            System.out.println(data.getFakeEdgesString());
-
-            return data;
+            return yaml.load(inputStream);
         } catch (FileNotFoundException e) {
-            LoggerUtil.LOGGER.log(Level.SEVERE, "FileNotFoundException = " + e.getMessage());
+            LoggerUtil.getLOGGER().log(Level.SEVERE, "FileNotFoundException = " + e.getMessage());
             System.exit(-1);
         } catch (Exception e) {
-            LoggerUtil.LOGGER.log(Level.SEVERE, "Invalid key value in the given YAML file = " + e.getMessage());
+            LoggerUtil.getLOGGER().log(Level.SEVERE, "Invalid key value in the given YAML file = " + e.getMessage());
             System.exit(-1);
         }
 

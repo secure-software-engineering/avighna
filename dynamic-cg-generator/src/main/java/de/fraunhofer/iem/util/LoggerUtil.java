@@ -1,7 +1,33 @@
 package de.fraunhofer.iem.util;
 
+import de.fraunhofer.iem.DynamicCallStackManager;
+
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Logger;
 
+/**
+ * Utility class for logging
+ *
+ * @author Ranjith Krishnamurthy
+ */
 public class LoggerUtil {
-    public static Logger LOGGER = null;
+    private static Logger LOGGER = null;
+
+    public static Logger getLOGGER() {
+        if (LOGGER == null) {
+            LoggerUtil.LOGGER = Logger.getLogger(DynamicCallStackManager.class.getName());
+
+            LoggerUtil.LOGGER.setUseParentHandlers(false);
+
+            ConsoleHandler handler = new ConsoleHandler();
+
+            Formatter formatter = new LogFormatter();
+            handler.setFormatter(formatter);
+
+            LoggerUtil.LOGGER.addHandler(handler);
+        }
+
+        return LOGGER;
+    }
 }

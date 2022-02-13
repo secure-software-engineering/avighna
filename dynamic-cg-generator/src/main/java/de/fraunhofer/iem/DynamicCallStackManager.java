@@ -46,7 +46,7 @@ public class DynamicCallStackManager {
 
             dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
             myDynamicCallStack.add(dynamicCallStack);
-            LoggerUtil.LOGGER.info("Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId());
+            LoggerUtil.getLOGGER().info("Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId());
         }
 
         if (isLibraryCall) {
@@ -69,7 +69,7 @@ public class DynamicCallStackManager {
             if (isLibraryCall) return;
 
             dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
-            LoggerUtil.LOGGER.log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
+            LoggerUtil.getLOGGER().log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
                     "However, it happened in methodReturn, Please check the logic.");
         }
 
@@ -89,7 +89,7 @@ public class DynamicCallStackManager {
         if (dynamicCallStack == null) {
             dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
             myDynamicCallStack.add(dynamicCallStack);
-            LoggerUtil.LOGGER.log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
+            LoggerUtil.getLOGGER().log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
                     "However, it happened in writeForcefully, Please check the logic.");
         }
 
