@@ -20,14 +20,13 @@ import java.util.List;
 public class AgentTransformer implements ClassFileTransformer {
     private static final List<String> exclude = new ArrayList<>();
 
-    private final String applicationRootPackage;
+    private final String rootPackageNameOfApplication;
 
-    public AgentTransformer(String applicationRootPackage) {
-        this.applicationRootPackage = applicationRootPackage;
+    public AgentTransformer(String rootPackageNameOfApplication) {
+        this.rootPackageNameOfApplication = rootPackageNameOfApplication;
     }
 
     static {
-        exclude.add("java/");
         exclude.add("de/fraunhofer/iem/DynamicCGStack");
         exclude.add("de/fraunhofer/iem/DynamicCallStack");
         exclude.add("de/fraunhofer/iem/DynamicCallStackManager");
@@ -41,7 +40,7 @@ public class AgentTransformer implements ClassFileTransformer {
         exclude.add("de/fraunhofer/iem/util/SerializableDotGraph");
         exclude.add("de/fraunhofer/iem/util/SerializableUtility");
         //TODO: the below will cause termination of the tool, test it and fix it
-        exclude.add("de/fraunhofer/iem/springbench/bean/configurations/MyConfiguration$$EnhancerBySpringCGLIB");
+//        exclude.add("de/fraunhofer/iem/springbench/bean/configurations/MyConfiguration$$EnhancerBySpringCGLIB");
     }
 
     @Override
@@ -52,7 +51,7 @@ public class AgentTransformer implements ClassFileTransformer {
             }
         }
 
-        if (className.startsWith(this.applicationRootPackage)) {
+        if (className.startsWith(this.rootPackageNameOfApplication)) {
             return enhanceClass(className, classfileBuffer, false);
         } else {
             return enhanceClass(className, classfileBuffer, true);
