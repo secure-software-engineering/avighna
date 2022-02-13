@@ -1,8 +1,15 @@
 package de.fraunhofer.iem;
 
+import de.fraunhofer.iem.util.LoggerUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class DynamicCallStackManager {
     private static final List<DynamicCallStack> myDynamicCallStack = Collections.synchronizedList(new ArrayList<>());
@@ -27,6 +34,8 @@ public class DynamicCallStackManager {
 
             dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
             myDynamicCallStack.add(dynamicCallStack);
+            LoggerUtil.LOGGER.log(Level.INFO, "ENTERED");
+            System.out.println(System.identityHashCode("----> " + DynamicCallStackManager.class.getClassLoader()));
         }
 
         if (isLibraryCall) {

@@ -1,16 +1,16 @@
 package de.fraunhofer.iem;
 
 import de.fraunhofer.iem.util.DynamicAgentConfiguration;
+import de.fraunhofer.iem.util.LogFormatter;
+import de.fraunhofer.iem.util.LoggerUtil;
 import de.fraunhofer.iem.util.YamlUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.net.JarURLConnection;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
 
 /**
  * Agent for generating Dynamic CG
@@ -18,8 +18,6 @@ import java.net.JarURLConnection;
  * @author Ranjith Krishnamurthy
  */
 public class DynamicCGAgent {
-    private static final Logger LOGGER = LogManager.getLogger(DynamicCGAgent.class);
-
     public static DynamicAgentConfiguration dynamicAgentConfiguration;
 
     /**
@@ -29,8 +27,26 @@ public class DynamicCGAgent {
      * @param instrumentation Instrumentation
      */
     public static void premain(String argument, Instrumentation instrumentation) {
-        LOGGER.info("Dynamic Agent started");
-        LOGGER.info("Loading the given YAML settings file: " + argument);
+        InputStream stream = LoggerUtil.class.getClassLoader().
+                getResourceAsStream("logging.properties");
+        try {
+            java.util.logging.LogManager.getLogManager().readConfiguration(stream);
+            LoggerUtil.LOGGER = java.util.logging.Logger.getLogger(DynamicCallStackManager.class.getName());
+
+            LoggerUtil.LOGGER.setUseParentHandlers(false);
+
+            ConsoleHandler handler = new ConsoleHandler();
+
+            Formatter formatter = new LogFormatter();
+            handler.setFormatter(formatter);
+
+            LoggerUtil.LOGGER.addHandler(handler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        LoggerUtil.LOGGER.info("Dynamic Agent started");
+        LoggerUtil.LOGGER.info("Loading the given YAML settings file: " + argument);
 
         // Load the YAML settings file
         dynamicAgentConfiguration = YamlUtil.parse(argument);
@@ -40,32 +56,32 @@ public class DynamicCGAgent {
             JarURLConnection connection = (JarURLConnection) DynamicCGAgent.class.getResource("DynamicCGAgent.class").openConnection();
             instrumentation.appendToBootstrapClassLoaderSearch(connection.getJarFile());
         } catch (IOException e) {
-            LOGGER.error("Something went wrong while setting the class loader = " + e.getMessage());
+            LoggerUtil.LOGGER.log(Level.SEVERE, "Something went wrong while setting the class loader = " + e.getMessage());
             System.exit(-1);
         }
 
 
-        LOGGER.info("Checking the given root output directory = " + DynamicCGAgent.dynamicAgentConfiguration.getOutputRootDirectory());
+        LoggerUtil.LOGGER.info("Checking the given root output directory = " + DynamicCGAgent.dynamicAgentConfiguration.getOutputRootDirectory());
         File rootOutputDirectory = new File(dynamicAgentConfiguration.getOutputRootDirectory());
 
         if (rootOutputDirectory.exists()) {
             if (!rootOutputDirectory.isDirectory()) {
-                LOGGER.error("Given output root directory (" +
+                LoggerUtil.LOGGER.log(Level.SEVERE, "Given output root directory (" +
                         dynamicAgentConfiguration.getOutputRootDirectory() + ") is not valid");
                 System.exit(-1);
             }
 
-            LOGGER.info("The given root output directory exists");
+            LoggerUtil.LOGGER.info("The given root output directory exists");
         } else {
             rootOutputDirectory.mkdirs();
-            LOGGER.info("The given root output directory doesn't exists. Creating the directory (" +
+            LoggerUtil.LOGGER.info("The given root output directory doesn't exists. Creating the directory (" +
                     dynamicAgentConfiguration.getOutputRootDirectory() + ")");
         }
 
         // Statistics file
         String statFileName = rootOutputDirectory.getAbsolutePath().toString() +
                 System.getProperty("file.separator") + "stats.txt";
-        LOGGER.info("Creating the statistics file = " + statFileName);
+        LoggerUtil.LOGGER.info("Creating the statistics file = " + statFileName);
 
         try {
             File file = new File(statFileName);
@@ -75,14 +91,14 @@ public class DynamicCGAgent {
             out.write("Dynamic Call Stack:\n");
             out.close();
         } catch (IOException e) {
-            LOGGER.error("Could not create statistics file = " + e.getMessage());
+            LoggerUtil.LOGGER.log(Level.SEVERE, "Could not create statistics file = " + e.getMessage());
             System.exit(-1);
         }
 
         // Error file
         String errorFileName = rootOutputDirectory.getAbsolutePath().toString() +
                 System.getProperty("file.separator") + "error.txt";
-        LOGGER.info("Creating the error file = " + errorFileName);
+        LoggerUtil.LOGGER.info("Creating the error file = " + errorFileName);
         try {
             File file = new File(errorFileName);
             FileWriter fileWriter = new FileWriter(file);
@@ -91,16 +107,16 @@ public class DynamicCGAgent {
             out.write("Dynamic Call Stack (ERROR):\n");
             out.close();
         } catch (IOException e) {
-            LOGGER.error("Could not create error file = " + e.getMessage());
+            LoggerUtil.LOGGER.log(Level.SEVERE, "Could not create error file = " + e.getMessage());
             System.exit(-1);
         }
 
-        LOGGER.info("Root application package name  = " + dynamicAgentConfiguration.getRootPackageNameOfApplication());
+        LoggerUtil.LOGGER.info("Root application package name  = " + dynamicAgentConfiguration.getRootPackageNameOfApplication());
 
         String applicationRootPackage = dynamicAgentConfiguration
                 .getRootPackageNameOfApplication().replaceAll("\\.", "/") + "/";
 
-        LOGGER.info("Instrumentation begins");
+        LoggerUtil.LOGGER.info("Instrumentation begins");
         instrumentation.addTransformer(new AgentTransformer(applicationRootPackage));
     }
 
@@ -111,6 +127,6 @@ public class DynamicCGAgent {
      * @param instrumentation Instrumentation
      */
     public static void agentmain(String argument, Instrumentation instrumentation) {
-        LOGGER.info("Started agent-main");
+        LoggerUtil.LOGGER.info("Started agent-main");
     }
 }

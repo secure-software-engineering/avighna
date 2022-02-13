@@ -1,13 +1,12 @@
 package de.fraunhofer.iem.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.logging.Level;
 
 /**
  * Utility class for Yaml
@@ -15,8 +14,6 @@ import java.io.InputStream;
  * @author Ranjith Krishnamurthy
  */
 public class YamlUtil {
-    private static final Logger LOGGER = LogManager.getLogger(YamlUtil.class);
-
     /**
      * Parses the given yaml file and then returns the DynamicAgentConfiguration object
      *
@@ -38,10 +35,10 @@ public class YamlUtil {
 
             return data;
         } catch (FileNotFoundException e) {
-            LOGGER.error("FileNotFoundException = " + e.getMessage());
+            LoggerUtil.LOGGER.log(Level.SEVERE, "FileNotFoundException = " + e.getMessage());
             System.exit(-1);
         } catch (Exception e) {
-            LOGGER.error("Invalid key value in the given YAML file = " + e.getMessage());
+            LoggerUtil.LOGGER.log(Level.SEVERE, "Invalid key value in the given YAML file = " + e.getMessage());
             System.exit(-1);
         }
 
