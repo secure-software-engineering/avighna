@@ -104,7 +104,7 @@ public class DynamicCGAgent {
                 .replaceAll("]", ""));
 
         LoggerUtil.getLOGGER().info("Instrumentation begins");
-        instrumentation.addTransformer(new AgentTransformer(applicationRootPackage));
+        instrumentation.addTransformer(new AgentTransformer(applicationRootPackage, dynamicAgentConfiguration.getExcludeClasses()));
     }
 
     /**

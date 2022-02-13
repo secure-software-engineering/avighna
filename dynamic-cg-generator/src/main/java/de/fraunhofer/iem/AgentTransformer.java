@@ -18,27 +18,24 @@ import java.util.List;
  * @author Ranjith Krishnamurthy
  */
 public class AgentTransformer implements ClassFileTransformer {
-    private static final List<String> exclude = new ArrayList<>();
-
+    private final List<String> exclude = new ArrayList<>();
     private final String rootPackageNameOfApplication;
 
-    public AgentTransformer(String rootPackageNameOfApplication) {
+    public AgentTransformer(String rootPackageNameOfApplication, List<String> excludeClasses) {
         this.rootPackageNameOfApplication = rootPackageNameOfApplication;
-    }
-
-    static {
-        exclude.add("de/fraunhofer/iem/DynamicCGStack");
-        exclude.add("de/fraunhofer/iem/DynamicCallStack");
-        exclude.add("de/fraunhofer/iem/DynamicCallStackManager");
-        exclude.add("de/fraunhofer/iem/DynamicCGAgent");
-        exclude.add("de/fraunhofer/iem/CallType");
-        exclude.add("de/fraunhofer/iem/MyFirstJavaAgent");
-        exclude.add("de/fraunhofer/iem/hybridCG/HybridCallGraph");
-        exclude.add("de/fraunhofer/iem/util/DirectedEdge");
-        exclude.add("de/fraunhofer/iem/util/EdgesInAGraph");
-        exclude.add("de/fraunhofer/iem/util/FakeSerializableDotGraph");
-        exclude.add("de/fraunhofer/iem/util/SerializableDotGraph");
-        exclude.add("de/fraunhofer/iem/util/SerializableUtility");
+        this.exclude.addAll(excludeClasses);
+        this.exclude.add("de/fraunhofer/iem/DynamicCGStack");
+        this.exclude.add("de/fraunhofer/iem/DynamicCallStack");
+        this.exclude.add("de/fraunhofer/iem/DynamicCallStackManager");
+        this.exclude.add("de/fraunhofer/iem/DynamicCGAgent");
+        this.exclude.add("de/fraunhofer/iem/CallType");
+        this.exclude.add("de/fraunhofer/iem/MyFirstJavaAgent");
+        this.exclude.add("de/fraunhofer/iem/hybridCG/HybridCallGraph");
+        this.exclude.add("de/fraunhofer/iem/util/DirectedEdge");
+        this.exclude.add("de/fraunhofer/iem/util/EdgesInAGraph");
+        this.exclude.add("de/fraunhofer/iem/util/FakeSerializableDotGraph");
+        this.exclude.add("de/fraunhofer/iem/util/SerializableDotGraph");
+        this.exclude.add("de/fraunhofer/iem/util/SerializableUtility");
         //TODO: the below will cause termination of the tool, test it and fix it
 //        exclude.add("de/fraunhofer/iem/springbench/bean/configurations/MyConfiguration$$EnhancerBySpringCGLIB");
     }
