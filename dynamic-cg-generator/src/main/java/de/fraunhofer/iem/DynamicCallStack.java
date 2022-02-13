@@ -2,6 +2,8 @@ package de.fraunhofer.iem;
 
 
 import de.fraunhofer.iem.util.*;
+import guru.nidi.graphviz.engine.Format;
+import guru.nidi.graphviz.engine.Graphviz;
 import soot.util.dot.DotGraphEdge;
 
 import java.io.*;
@@ -256,6 +258,16 @@ public class DynamicCallStack {
                         new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot")
                                 .getAbsolutePath().toString());
             }
+
+            if (saveCallGraphAsImage) {
+                saveDotAsSVG(
+                        outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot",
+                        outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg"
+                );
+                LoggerUtil.getLOGGER().info("SVG file of Dynamic CG dumped to the file = " +
+                        new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg")
+                                .getAbsolutePath().toString());
+            }
         } else {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
@@ -304,5 +316,20 @@ public class DynamicCallStack {
     public void writeRequest() {
         writeToFile();
         callStack.clear();
+    }
+
+    /**
+     * This method converts the given dot file into image file
+     *
+     * @param dotFileName         Dot file name
+     * @param outputImageFileName Image file name
+     */
+    private void saveDotAsSVG(String dotFileName, String outputImageFileName) {
+        try {
+            Graphviz.fromFile(new File(dotFileName)).render(Format.SVG).toFile(new File(outputImageFileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

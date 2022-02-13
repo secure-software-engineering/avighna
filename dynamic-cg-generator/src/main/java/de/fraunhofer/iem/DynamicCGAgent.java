@@ -109,7 +109,7 @@ public class DynamicCGAgent {
         DynamicCallStack.saveCallGraphAsImage = dynamicAgentConfiguration.isSaveCallGraphAsImage();
 
         LoggerUtil.getLOGGER().info("Instrumentation begins");
-        instrumentation.addTransformer(new AgentTransformer(applicationRootPackage, dynamicAgentConfiguration.getExcludeClasses()));
+        instrumentation.addTransformer(new AgentTransformer(applicationRootPackage, dynamicAgentConfiguration.getOutputRootDirectory(), dynamicAgentConfiguration.getExcludeClasses()));
     }
 
     /**

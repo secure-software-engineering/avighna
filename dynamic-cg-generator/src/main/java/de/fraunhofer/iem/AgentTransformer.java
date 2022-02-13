@@ -20,9 +20,11 @@ import java.util.List;
 public class AgentTransformer implements ClassFileTransformer {
     private final List<String> exclude = new ArrayList<>();
     private final String rootPackageNameOfApplication;
+    private final String rootOutputDirectory;
 
-    public AgentTransformer(String rootPackageNameOfApplication, List<String> excludeClasses) {
+    public AgentTransformer(String rootPackageNameOfApplication, String rootOutputDirectory, List<String> excludeClasses) {
         this.rootPackageNameOfApplication = rootPackageNameOfApplication;
+        this.rootOutputDirectory = rootOutputDirectory;
         this.exclude.addAll(excludeClasses);
         this.exclude.add("de/fraunhofer/iem/DynamicCGStack");
         this.exclude.add("de/fraunhofer/iem/DynamicCallStack");
@@ -81,7 +83,8 @@ public class AgentTransformer implements ClassFileTransformer {
             }
         } catch (CannotCompileException | IOException e) {
             try {
-                BufferedWriter out = new BufferedWriter(new FileWriter("error.txt", true));
+                BufferedWriter out = new BufferedWriter(new FileWriter(
+                        rootOutputDirectory + System.getProperty("file.separator") + "error.txt", true));
                 out.write(currentlyProcessingMethod + " ----- " + e.getClass().getName() + "---" + e.getMessage() + "\n");
                 out.close();
             } catch (IOException ex) {
