@@ -4,6 +4,7 @@ import de.fraunhofer.iem.util.DynamicAgentConfiguration;
 import de.fraunhofer.iem.util.LogFormatter;
 import de.fraunhofer.iem.util.LoggerUtil;
 import de.fraunhofer.iem.util.YamlUtil;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.lang.instrument.Instrumentation;
@@ -29,6 +30,21 @@ public class DynamicCGAgent {
     public static void premain(String argument, Instrumentation instrumentation) {
         LoggerUtil.getLOGGER().info("Dynamic Agent started");
         LoggerUtil.getLOGGER().info("Loading the given YAML settings file: " + argument);
+
+        try {
+            InputStream is = DynamicCGAgent.class.getClassLoader().getResourceAsStream("DotToSvg.jar");
+
+            File tempFile = File.createTempFile("DotToSvg", ".jar");
+            tempFile.deleteOnExit();
+            FileOutputStream out = new FileOutputStream(tempFile);
+            IOUtils.copy(is, out);
+            is.close();
+
+            DynamicCallStack.dotToSvgJarPath = tempFile.getAbsolutePath();
+        } catch (Exception e) {
+            LoggerUtil.getLOGGER().log(Level.WARNING, "Could not copy the DotToSvg.jar file. Can not generate SVG file." +
+                    "Error = " + e.getMessage());
+        }
 
         // Load the YAML settings file
         dynamicAgentConfiguration = YamlUtil.parse(argument);

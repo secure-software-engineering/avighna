@@ -4,10 +4,12 @@ package de.fraunhofer.iem;
 import de.fraunhofer.iem.util.*;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
+import org.apache.commons.io.IOUtils;
 import soot.util.dot.DotGraphEdge;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
 
 
 /**
@@ -42,8 +44,7 @@ public class DynamicCallStack {
     public DynamicCallStack(long pid) {
         this.pid = pid;
         this.callStack = new ArrayList<>();
-        this.outputFile = outputRootDirectory +
-                System.getProperty("file.separator") + "stack_" + this.pid + ".txt";
+        this.outputFile = outputRootDirectory + System.getProperty("file.separator") + "stack_" + this.pid + ".txt";
         this.continuousCallStack = new ArrayList<>();
         this.associatedLibraryCallStack = new ArrayList<>();
         this.isAssociatedLibraryCallPresent = false;
@@ -243,30 +244,18 @@ public class DynamicCallStack {
 
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
 
-            SerializableUtility.serialize(
-                    edgesInAGraph,
-                    outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid);
+            SerializableUtility.serialize(edgesInAGraph, outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid);
 
-            LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " +
-                    new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser")
-                            .getAbsolutePath().toString());
+            LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
 
             if (saveCallGraphAsDotFile) {
-                dotGraph.plot(
-                        outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
-                LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " +
-                        new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot")
-                                .getAbsolutePath().toString());
+                dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
+                LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
             }
 
             if (saveCallGraphAsImage) {
-                saveDotAsSVG(
-                        outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot",
-                        outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg"
-                );
-                LoggerUtil.getLOGGER().info("SVG file of Dynamic CG dumped to the file = " +
-                        new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg")
-                                .getAbsolutePath().toString());
+                saveDotAsSVG(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot", outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg");
+                LoggerUtil.getLOGGER().info("SVG file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg").getAbsolutePath().toString());
             }
         } else {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
@@ -318,6 +307,8 @@ public class DynamicCallStack {
         callStack.clear();
     }
 
+    public static String dotToSvgJarPath = null;
+
     /**
      * This method converts the given dot file into image file
      *
@@ -325,11 +316,33 @@ public class DynamicCallStack {
      * @param outputImageFileName Image file name
      */
     private void saveDotAsSVG(String dotFileName, String outputImageFileName) {
-        try {
-            Graphviz.fromFile(new File(dotFileName)).render(Format.SVG).toFile(new File(outputImageFileName));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (dotToSvgJarPath == null) {
+            LoggerUtil.getLOGGER().log(Level.WARNING, "Can not generates SVG file");
+            return;
         }
 
+        try {
+            String command = "java -jar " + dotToSvgJarPath + " " + dotFileName + " " + outputImageFileName;
+
+            LoggerUtil.getLOGGER().info(command);
+            Process proc = Runtime.getRuntime().exec(command);
+
+            InputStream err = proc.getErrorStream();
+
+            BufferedReader inn = new BufferedReader(new InputStreamReader(err));
+            String message = null;
+            String line = null;
+            while ((line = inn.readLine()) != null) {
+                if (message == null) message = line + "\n";
+
+                message += line + "\n";
+            }
+
+            if (line != null) {
+                LoggerUtil.getLOGGER().log(Level.WARNING, "Some error occurred while generating SVG file = Message from external Jar is = " + message);
+            }
+        } catch (IOException e) {
+            LoggerUtil.getLOGGER().log(Level.WARNING, "Some error occurred while generating SVG file = " + e.getMessage());
+        }
     }
 }
