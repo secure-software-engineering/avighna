@@ -324,7 +324,6 @@ public class DynamicCallStack {
         try {
             String command = "java -jar " + dotToSvgJarPath + " " + dotFileName + " " + outputImageFileName;
 
-            LoggerUtil.getLOGGER().info(command);
             Process proc = Runtime.getRuntime().exec(command);
 
             InputStream err = proc.getErrorStream();
