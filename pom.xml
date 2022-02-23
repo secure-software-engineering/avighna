@@ -41,5 +41,6 @@
     <modules>
         <module>hybridCG-merger</module>
         <module>dynamic-cg-generator</module>
+        <module>dynamic-cg-cmd-interface</module>
     </modules>
 </project>

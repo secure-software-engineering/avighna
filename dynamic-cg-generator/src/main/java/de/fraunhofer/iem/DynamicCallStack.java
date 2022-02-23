@@ -248,7 +248,7 @@ public class DynamicCallStack {
 
             LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
 
-            if (saveCallGraphAsDotFile) {
+            if (saveCallGraphAsDotFile || saveCallGraphAsImage) {
                 dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
                 LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
             }
@@ -256,6 +256,11 @@ public class DynamicCallStack {
             if (saveCallGraphAsImage) {
                 saveDotAsSVG(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot", outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg");
                 LoggerUtil.getLOGGER().info("SVG file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg").getAbsolutePath().toString());
+            }
+
+            if (saveCallGraphAsImage && !saveCallGraphAsDotFile) {
+                new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot")
+                        .delete();
             }
         } else {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
