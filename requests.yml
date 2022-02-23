@@ -1,0 +1,3 @@
+requests:
+  - 'curl http://localhost:8080/encryptMyMessage?message=ranjith'
+  - 'curl http://localhost:8080/encryptMyMessage?message=ranjith'

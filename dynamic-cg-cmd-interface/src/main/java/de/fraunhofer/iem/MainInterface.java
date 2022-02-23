@@ -1,0 +1,126 @@
+package de.fraunhofer.iem;
+
+import de.fraunhofer.iem.util.CommandLineUtility;
+import de.fraunhofer.iem.util.RequestFile;
+import de.fraunhofer.iem.util.YamlUtility;
+import de.fraunhofer.iem.util.ZipUtil;
+import org.apache.commons.cli.*;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+public class MainInterface {
+    public static final RequestFile requestFile = new RequestFile();
+
+    private static String agentSettingFile;
+
+    private static boolean isInterrupted = false;
+
+    private static void runApplicationWithJavaAgent(CommandLine commandLine) {
+        try {
+            String cmd = "java" +
+                    " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
+                    " -jar " +
+                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
+
+            Process proc = Runtime.getRuntime().exec(cmd);
+
+            System.out.println(cmd);
+
+            InputStream stdErr = proc.getErrorStream();
+            InputStreamReader isrErr = new InputStreamReader(stdErr);
+            BufferedReader brErr = new BufferedReader(isrErr);
+
+            String linee = null;
+            System.out.println("ERROR = ");
+
+            while (!isInterrupted) {
+                if (brErr.ready()) {
+                    System.out.println(brErr.readLine());
+                }
+            }
+
+            InputStream stdIn = proc.getInputStream();
+            InputStreamReader isr = new InputStreamReader(stdIn);
+            BufferedReader br = new BufferedReader(isr);
+
+            String line = null;
+            System.out.println("OUTPUT = ");
+
+            while (!isInterrupted) {
+                if (br.ready()) {
+                    System.out.println(br.readLine());
+                }
+            }
+
+            proc.destroy();
+
+            if (proc.isAlive()) {
+                proc.destroyForcibly();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void main(String[] args) {
+        CommandLineUtility.initializeCommandLineOptions();
+
+        CommandLineUtility.getCommandLineOptions(args);
+
+        CommandLineUtility.validateCommandLineOptions();
+
+        agentSettingFile = YamlUtility.generateAgentSettingsFile(CommandLineUtility.getCommandLine());
+
+        File tempFile = new File(
+                CommandLineUtility.getCommandLine().getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT)
+                        + File.separator + "allDotFiles" + File.separator + "dynamic_callgraph_1.ser");
+
+        if (tempFile.exists())
+            tempFile.delete();
+
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runApplicationWithJavaAgent(CommandLineUtility.getCommandLine());
+            }
+        });
+        t1.start();
+
+
+        while (true) {
+            if (tempFile.exists())
+                break;
+        }
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        for (String request : requestFile.getRequests()) {
+            try {
+                System.out.println("Executing = " + request);
+                Runtime.getRuntime().exec(request).waitFor();
+                Thread.sleep(3000);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        isInterrupted = true;
+
+        if (t1.isAlive()) {
+            System.out.println("Saddddlyyy still alllive");
+        }
+
+        ZipUtil.generateDTS(CommandLineUtility.getCommandLine());
+    }
+}
