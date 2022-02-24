@@ -2,8 +2,10 @@ package de.fraunhofer.iem.util;
 
 import de.fraunhofer.iem.MainInterface;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 public class CommandLineUtility {
     /**
@@ -165,7 +167,11 @@ public class CommandLineUtility {
                 System.out.println("Given root out directory (" + jarFilePath + ") is not a directory");
                 System.exit(-1);
             } else {
-                outDir.deleteOnExit();
+                try {
+                    FileUtils.deleteDirectory(outDir);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             if (!outDir.mkdirs()) {
