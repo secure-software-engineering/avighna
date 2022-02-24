@@ -21,7 +21,7 @@ public class SerializableUtility {
         EdgesInAGraph edgesInAGraph = null;
 
         try {
-            FileInputStream fileInputStream = new FileInputStream(filename + ".ser");
+            FileInputStream fileInputStream = new FileInputStream(filename);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
             edgesInAGraph = (EdgesInAGraph) objectInputStream.readObject();
