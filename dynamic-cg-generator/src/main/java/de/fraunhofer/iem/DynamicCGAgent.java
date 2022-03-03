@@ -40,7 +40,6 @@ public class DynamicCGAgent {
             IOUtils.copy(is, out);
             is.close();
 
-            DynamicCallStack.dotToSvgJarPath = tempFile.getAbsolutePath();
         } catch (Exception e) {
             LoggerUtil.getLOGGER().log(Level.WARNING, "Could not copy the DotToSvg.jar file. Can not generate SVG file." +
                     "Error = " + e.getMessage());
@@ -109,7 +108,6 @@ public class DynamicCGAgent {
 
         LoggerUtil.getLOGGER().info("Root application package name = " + applicationRootPackage);
         LoggerUtil.getLOGGER().info("Save Dynamic CG as DOT file? = " + dynamicAgentConfiguration.isSaveCallGraphAsDotFile());
-        LoggerUtil.getLOGGER().info("Save Dynamic CG as Image? = " + dynamicAgentConfiguration.isSaveCallGraphAsImage());
         LoggerUtil.getLOGGER().info("Excluded classes = " + dynamicAgentConfiguration.getExcludeClasses().toString()
                 .replace("[", "\n")
                 .replaceAll(", ", "\n")
@@ -122,7 +120,6 @@ public class DynamicCGAgent {
         DynamicCallStack.outputRootDirectory = dynamicAgentConfiguration.getOutputRootDirectory();
         DynamicCallStack.fakeEdges.addAll(dynamicAgentConfiguration.getFakeEdgesString());
         DynamicCallStack.saveCallGraphAsDotFile = dynamicAgentConfiguration.isSaveCallGraphAsDotFile();
-        DynamicCallStack.saveCallGraphAsImage = dynamicAgentConfiguration.isSaveCallGraphAsImage();
 
         LoggerUtil.getLOGGER().info("Instrumentation begins");
         instrumentation.addTransformer(new AgentTransformer(applicationRootPackage, dynamicAgentConfiguration.getOutputRootDirectory(), dynamicAgentConfiguration.getExcludeClasses()));

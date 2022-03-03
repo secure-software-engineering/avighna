@@ -72,8 +72,8 @@ public class YamlUtility {
         file.mkdirs();
 
         dynamicAgentConfiguration.setOutputRootDirectory(file.getAbsolutePath());
-        dynamicAgentConfiguration.setSaveCallGraphAsDotFile(commandLine.hasOption(CommandLineUtility.SAVE_DOT_FILE_LONG));
-        dynamicAgentConfiguration.setSaveCallGraphAsImage(commandLine.hasOption(CommandLineUtility.SAVE_IMG_FILE_SHORT));
+
+        dynamicAgentConfiguration.setSaveCallGraphAsDotFile(commandLine.hasOption(CommandLineUtility.SAVE_DOT_FILE_LONG) || commandLine.hasOption(CommandLineUtility.SAVE_IMG_FILE_LONG));
 
         List<String> excludeClasses = new ArrayList<>();
         excludeClasses.add("java/");

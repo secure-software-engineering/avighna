@@ -1,9 +1,6 @@
 package de.fraunhofer.iem;
 
-import de.fraunhofer.iem.util.CommandLineUtility;
-import de.fraunhofer.iem.util.RequestFile;
-import de.fraunhofer.iem.util.YamlUtility;
-import de.fraunhofer.iem.util.ZipUtil;
+import de.fraunhofer.iem.util.*;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -122,5 +119,9 @@ public class MainInterface {
         }
 
         ZipUtil.generateDTS(CommandLineUtility.getCommandLine());
+
+        if (CommandLineUtility.getCommandLine().hasOption(CommandLineUtility.SAVE_IMG_FILE_LONG)) {
+            DotToImgUtil.generateImageFromDot();
+        }
     }
 }
