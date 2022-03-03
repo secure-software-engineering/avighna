@@ -15,7 +15,7 @@
         <soot-version>4.3.0-SNAPSHOT</soot-version>
         <java-assist-version>3.28.0-GA</java-assist-version>
         <current-version>1.0-SNAPSHOT</current-version>
-        <yaml-version>1.28</yaml-version>
+        <yaml-version>1.29</yaml-version>
         <log4j-version>2.17.1</log4j-version>
     </properties>
 
