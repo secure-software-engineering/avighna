@@ -5,13 +5,18 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import org.apache.commons.cli.CommandLine;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
+/**
+ * Utility class to convert the DOT file to image file
+ *
+ * @author Ranjith Krishnamurthy
+ */
 public class DotToImgUtil {
     /**
      * This method converts the given dot file into image file
@@ -27,15 +32,16 @@ public class DotToImgUtil {
         }
     }
 
+    /**
+     * Generates images files for all the DOT files present in the given output root directory
+     */
     public static void generateImageFromDot() {
         CommandLine commandLine = CommandLineUtility.getCommandLine();
-        String outRootDir = commandLine.getOptionValue(CommandLineUtility.OUT_ROOT_DIR_LONG);
-        ;
 
         List<String> dotFiles = new ArrayList<>();
 
         try {
-            Files.walk(Paths.get(CommandLineUtility.getCommandLine().getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT) + File.separator + "allDotFiles" + File.separator))
+            Files.walk(Paths.get(MainInterface.getAllDotFilesLocation() + File.separator))
                     .filter(Files::isRegularFile)
                     .filter(it -> it.toAbsolutePath().toString().endsWith(".dot"))
                     .forEach(it -> {

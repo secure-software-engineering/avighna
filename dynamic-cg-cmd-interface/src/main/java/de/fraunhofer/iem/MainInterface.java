@@ -4,25 +4,23 @@ import de.fraunhofer.iem.util.*;
 import org.apache.commons.cli.*;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
+/**
+ * Main method of this command line tool
+ *
+ * @author Ranjith Krishnamurthy
+ */
 public class MainInterface {
     public static final RequestFile requestFile = new RequestFile();
 
     private static String agentSettingFile;
+    private static String allDotFilesLocation;
 
     private static boolean isInterrupted = false;
 
     private static void runApplicationWithJavaAgent(CommandLine commandLine) {
         try {
-            String cmd = "java" +
-                    " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
-                    " -jar " +
-                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
+            String cmd = "java" + " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile + " -jar " + commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
 
             Process proc = Runtime.getRuntime().exec(cmd);
 
@@ -32,7 +30,6 @@ public class MainInterface {
             InputStreamReader isrErr = new InputStreamReader(stdErr);
             BufferedReader brErr = new BufferedReader(isrErr);
 
-            String linee = null;
             System.out.println("ERROR = ");
 
             while (!isInterrupted) {
@@ -65,22 +62,24 @@ public class MainInterface {
         }
     }
 
-
+    /**
+     * Main Method
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         CommandLineUtility.initializeCommandLineOptions();
 
-        CommandLineUtility.getCommandLineOptions(args);
+        CommandLineUtility.parseCommandLineArguments(args);
 
         CommandLineUtility.validateCommandLineOptions();
 
         agentSettingFile = YamlUtility.generateAgentSettingsFile(CommandLineUtility.getCommandLine());
+        allDotFilesLocation = CommandLineUtility.getCommandLine().getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT) + File.separator + "allDotFiles";
 
-        File tempFile = new File(
-                CommandLineUtility.getCommandLine().getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT)
-                        + File.separator + "allDotFiles" + File.separator + "dynamic_callgraph_1.ser");
+        File tempFile = new File(allDotFilesLocation + File.separator + "dynamic_callgraph_1.ser");
 
-        if (tempFile.exists())
-            tempFile.delete();
+        if (tempFile.exists()) tempFile.delete();
 
         Thread t1 = new Thread(new Runnable() {
             @Override
@@ -92,8 +91,7 @@ public class MainInterface {
 
 
         while (true) {
-            if (tempFile.exists())
-                break;
+            if (tempFile.exists()) break;
         }
 
         try {
@@ -118,10 +116,18 @@ public class MainInterface {
             System.out.println("Saddddlyyy still alllive");
         }
 
-        ZipUtil.generateDTS(CommandLineUtility.getCommandLine());
+        ZipUtil.generateDTS();
 
         if (CommandLineUtility.getCommandLine().hasOption(CommandLineUtility.SAVE_IMG_FILE_LONG)) {
             DotToImgUtil.generateImageFromDot();
         }
+    }
+
+    public static String getAgentSettingFile() {
+        return agentSettingFile;
+    }
+
+    public static String getAllDotFilesLocation() {
+        return allDotFilesLocation;
     }
 }

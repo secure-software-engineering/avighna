@@ -63,7 +63,7 @@ public class YamlUtility {
 
         dynamicAgentConfiguration.setRootPackageNameOfApplication(commandLine.getOptionValue(CommandLineUtility.ROOT_APP_PACKAGE_SHORT));
 
-        File file = new File(commandLine.getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT) + File.separator + "allDotFiles");
+        File file = new File(MainInterface.getAllDotFilesLocation());
 
         if (file.exists()) {
             file.delete();

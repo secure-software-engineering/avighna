@@ -7,6 +7,11 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Utility class for parsing command line arguments
+ *
+ * @author Ranjith Krishnamurthy
+ */
 public class CommandLineUtility {
     /**
      * Below are the command line arguments options short and long names
@@ -29,6 +34,11 @@ public class CommandLineUtility {
     private static final Options cmdOptions = new Options();
     private static CommandLine commandLine;
 
+    /**
+     * Getter for commandLine
+     *
+     * @return CommandLine
+     */
     public static CommandLine getCommandLine() {
         return commandLine;
     }
@@ -36,9 +46,7 @@ public class CommandLineUtility {
     /**
      * Initializes the command line options.
      * <p>
-     * Note: In future, if needed to add new options, then add it here.
-     *
-     * @return Command line options
+     * Note: In the future, if needed to add new options, then add it here.
      */
     public static void initializeCommandLineOptions() {
         Option appJarFile = new Option(
@@ -99,7 +107,12 @@ public class CommandLineUtility {
         cmdOptions.addOption(saveImgFiles);
     }
 
-    public static void getCommandLineOptions(String[] args) {
+    /**
+     * Parses the given command line arguments and stores the parsed command line arguments in commandLine static variable
+     *
+     * @param args Command line arguments
+     */
+    public static void parseCommandLineArguments(String[] args) {
         // Initialize the command line options
 
         CommandLineParser commandLineParser = new DefaultParser();
@@ -110,10 +123,13 @@ public class CommandLineUtility {
             commandLine = commandLineParser.parse(cmdOptions, args);
         } catch (ParseException ex) {
             helpFormatter.printHelp("dynamic-cg-interface", cmdOptions);
-            return;
+            System.exit(-1);
         }
     }
 
+    /**
+     * Validates the parsed command line arguments
+     */
     public static void validateCommandLineOptions() {
         String appJarFilePath = commandLine.getOptionValue(CommandLineUtility.APP_JAR_LONG);
         String jarFilePath = commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG);
@@ -138,7 +154,7 @@ public class CommandLineUtility {
             System.exit(-1);
         }
 
-        // Verify given jar file path
+        // Verify given dynamic-cg-generator jar file path
         File jarFile = new File(jarFilePath);
 
         if (jarFile.exists()) {
