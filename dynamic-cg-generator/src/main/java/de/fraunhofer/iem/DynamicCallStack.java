@@ -2,14 +2,13 @@ package de.fraunhofer.iem;
 
 
 import de.fraunhofer.iem.util.*;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import org.apache.commons.io.IOUtils;
 import soot.util.dot.DotGraphEdge;
 
 import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -34,7 +33,6 @@ public class DynamicCallStack {
     public static final Set<String> fakeEdges = new HashSet<>();
     public static String outputRootDirectory;
     public static boolean saveCallGraphAsDotFile;
-    public static boolean saveCallGraphAsImage;
 
     /**
      * Initializes the stack
@@ -61,19 +59,25 @@ public class DynamicCallStack {
         return pid;
     }
 
+    /**
+     * Handles the library method return
+     *
+     * @param methodSignature Library method signature
+     */
     public void libraryReturnCall(String methodSignature) {
         if (associatedLibraryCallStack.size() > 0) {
             if (methodSignature.startsWith(associatedLibraryCallStack.get(associatedLibraryCallStack.size() - 1))) {
                 associatedLibraryCallStack.remove(associatedLibraryCallStack.size() - 1);
                 isAssociatedLibraryCallPresent = false;
-//                System.out.println("*** Library Return Call ***");
-//                System.out.println("CS = " + continuousCallStack);
-//                System.out.println("LCS = " + associatedLibraryCallStack);
-//                System.out.println("*** Library Return Call ***");
             }
         }
     }
 
+    /**
+     * Handles the library method call
+     *
+     * @param methodSignature Library method signature
+     */
     public void libraryCall(String methodSignature) {
         if (!isAssociatedLibraryCallPresent && this.continuousCallStack.size() != 0) {
             StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
@@ -87,32 +91,9 @@ public class DynamicCallStack {
                     if (sourceNode.split(":")[0].trim().startsWith(methodThatCalledLibraryMethod + "(")) {
                         this.associatedLibraryCallStack.add(methodSignature);
                         isAssociatedLibraryCallPresent = true;
-//                        System.out.println("*** Library Call ***");
-//                        System.out.println("CS = " + continuousCallStack);
-//                        System.out.println("LCS = " + associatedLibraryCallStack);
-//                        System.out.println("*** Library Call ***");
                     }
                 }
             }
-
-//            new Scanner(System.in).next();
-//            for (int index = 0; index < stackTraceElements.length; ++index) {
-//                StackTraceElement stackTraceElement = stackTraceElements[index];
-//                String currentMethodSignature = stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName();
-//
-//                if (sourceNode.split(":")[0].trim().startsWith(currentMethodSignature + "(")) {
-//                    String nextMethodSignature = stackTraceElements[index - 1].getClassName() + "." + stackTraceElements[index - 1].getMethodName();
-//
-//                    if (methodSignature.startsWith(nextMethodSignature + "(")) {
-//                        this.associatedLibraryCallStack.add(methodSignature);
-//                        isAssociatedLibraryCallPresent = true;
-//                        System.out.println("*** Library Call ***");
-//                        System.out.println("CS = " + continousCallStack);
-//                        System.out.println("LCS = " + associatedLibraryCallStack);
-//                        System.out.println("*** Library Call ***");
-//                    }
-//                }
-//            }
         }
     }
 
@@ -125,11 +106,6 @@ public class DynamicCallStack {
     public void methodCall(String methodSignature) {
         if (this.continuousCallStack.size() == 0) {
             this.continuousCallStack.add(methodSignature);
-//            System.out.println("*** Application Call ***");
-//            System.out.println("CS = " + continuousCallStack);
-//            System.out.println("LCS = " + associatedLibraryCallStack);
-//            System.out.println("*** Application Call ***");
-
         } else {
             String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
             String associatedLibraryCall = null;
@@ -155,10 +131,6 @@ public class DynamicCallStack {
                 }
             }
 
-//            if (destinationNode == null) {
-//                destinationNode = methodSignature + " : -1[]";
-//            }
-
             if (isFakeEdge(methodSignature)) isFakeEdge = true;
             else if (isFakeEdge(sourceNode)) {
                 isFakeEdge = true;
@@ -182,10 +154,8 @@ public class DynamicCallStack {
                 this.isAssociatedLibraryCallPresent = false;
             } else if (isCallSiteSameAsCaller) {
                 associatedLibraryCall = methodSignature;
-//                this.associatedLibraryCallStack.add(associatedLibraryCall);
             } else {
                 associatedLibraryCall = "NA";
-//                this.associatedLibraryCallStack.add("NA");
             }
 
             edgesInAGraph.addDirectedEdge(new DirectedEdge(sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller));
@@ -200,13 +170,15 @@ public class DynamicCallStack {
             }
 
             this.continuousCallStack.add(methodSignature);
-//            System.out.println("*** Application Call ***");
-//            System.out.println("CS = " + continuousCallStack);
-//            System.out.println("LCS = " + associatedLibraryCallStack);
-//            System.out.println("*** Application Call ***");
         }
     }
 
+    /**
+     * Checks whethere the application method call is a fake edge provided by the user
+     *
+     * @param methodSignature Application method signature
+     * @return Boolean, is fake edge?
+     */
     private boolean isFakeEdge(String methodSignature) {
         for (String fakeEdge : fakeEdges) {
             if (methodSignature.contains(fakeEdge)) {
@@ -215,18 +187,6 @@ public class DynamicCallStack {
         }
 
         return false;
-    }
-
-    public void methodCall_backup(String methodSignature) {
-        if (callStack.size() == MAX_STORAGE) {
-            writeToFile();
-
-            callStack.clear();
-        }
-
-        callStack.add(currentIndentation.toString() + ">" + methodSignature);
-
-        currentIndentation.append("  ");
     }
 
     /**
@@ -256,49 +216,5 @@ public class DynamicCallStack {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
         }
-
-//        System.out.println("*** Return Call ***");
-//        System.out.println("CS = " + continuousCallStack);
-//        System.out.println("LCS = " + associatedLibraryCallStack);
-//        System.out.println("*** Return Call ***");
-    }
-
-    private String readFromInputStream(InputStream inputStream) throws IOException {
-        StringBuilder resultStringBuilder = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                resultStringBuilder.append(line).append("\n");
-            }
-        }
-        return resultStringBuilder.toString();
-    }
-
-    public void methodReturn_backup(String methodSignature) {
-        currentIndentation.setLength(currentIndentation.length() - 2);
-
-        callStack.add(currentIndentation.toString() + "<" + methodSignature);
-
-        writeToFile();
-
-        callStack.clear();
-    }
-
-    public void writeToFile() {
-        try {
-            File file = new File(this.outputFile);
-
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-
-            writer.write("\n" + String.valueOf(callStack).replaceAll(", ", "\n").replaceAll("\\[", "").replaceAll("]", ""));
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void writeRequest() {
-        writeToFile();
-        callStack.clear();
     }
 }

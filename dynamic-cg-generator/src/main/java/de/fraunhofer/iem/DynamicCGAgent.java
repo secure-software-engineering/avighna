@@ -1,7 +1,6 @@
 package de.fraunhofer.iem;
 
 import de.fraunhofer.iem.util.DynamicAgentConfiguration;
-import de.fraunhofer.iem.util.LogFormatter;
 import de.fraunhofer.iem.util.LoggerUtil;
 import de.fraunhofer.iem.util.YamlUtil;
 import org.apache.commons.io.IOUtils;
@@ -9,8 +8,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.net.JarURLConnection;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Formatter;
 import java.util.logging.Level;
 
 /**

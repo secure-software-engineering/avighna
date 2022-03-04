@@ -79,20 +79,4 @@ public class DynamicCallStackManager {
             dynamicCallStack.methodReturn(methodSignature);
         }
     }
-
-    /**
-     * API that allows user to forcefully write the Dynamic CG to the file
-     */
-    public static void writeForcefully() {
-        DynamicCallStack dynamicCallStack = getDynamicCallStack();
-
-        if (dynamicCallStack == null) {
-            dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
-            myDynamicCallStack.add(dynamicCallStack);
-            LoggerUtil.getLOGGER().log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
-                    "However, it happened in writeForcefully, Please check the logic.");
-        }
-
-        dynamicCallStack.writeRequest();
-    }
 }

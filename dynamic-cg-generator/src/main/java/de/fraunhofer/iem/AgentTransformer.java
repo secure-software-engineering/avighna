@@ -57,6 +57,14 @@ public class AgentTransformer implements ClassFileTransformer {
         }
     }
 
+    /**
+     * This method instruments the code to generate dynamic traces
+     *
+     * @param className       Class name
+     * @param classfileBuffer Class file buffer
+     * @param isLibraryCall   is the method library or application call?
+     * @return Enhanced class
+     */
     private byte[] enhanceClass(String className, byte[] classfileBuffer, boolean isLibraryCall) {
         String currentlyProcessingMethod = "";
         ClassPool pool = ClassPool.getDefault();
