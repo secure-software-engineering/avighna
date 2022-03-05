@@ -2,6 +2,11 @@ package de.fraunhofer.iem.util;
 
 import java.io.*;
 
+/**
+ * Utility class to serialize and deserialize dynamic traces (EdgesInAGraph object)
+ *
+ * @author Ranjith Krishnamurthy
+ */
 public class SerializableUtility {
     public static void serialize(EdgesInAGraph edgesInAGraph, String filename) {
         try {

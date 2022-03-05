@@ -3,6 +3,11 @@ package de.fraunhofer.iem.util;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * This data structure contains all the DirectedEdge present in a single DOT graph.
+ *
+ * @author Ranjith Krishnamurthy
+ */
 public class EdgesInAGraph implements Serializable {
     private static final long serialVersionUID = 6529685028967757690L;
 

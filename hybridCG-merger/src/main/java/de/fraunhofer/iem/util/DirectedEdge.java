@@ -2,6 +2,11 @@ package de.fraunhofer.iem.util;
 
 import java.io.Serializable;
 
+/**
+ * This class is a data structure that contains a single edge from source method to destination method
+ *
+ * @author Ranjith Krishnamurthy
+ */
 public class DirectedEdge implements Serializable {
     private static final long serialVersionUID = 6529685099967757690L;
 
