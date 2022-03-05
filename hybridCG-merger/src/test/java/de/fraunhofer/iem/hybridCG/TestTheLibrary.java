@@ -1,5 +1,9 @@
 package de.fraunhofer.iem.hybridCG;
 
+import de.fraunhofer.iem.exception.DotToImgException;
+import de.fraunhofer.iem.exception.DtsSerializeUtilException;
+import de.fraunhofer.iem.exception.UnexpectedError;
+import de.fraunhofer.iem.exception.DtsZipUtilException;
 import soot.*;
 import soot.options.Options;
 
@@ -15,7 +19,7 @@ import org.junit.Test;
  */
 public class TestTheLibrary {
     @Test
-    public void test() {
+    public void test() throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException {
         //TODO: Remove this after testing
         String appClassPath = "D:\\cgbench\\CGBench\\bean\\target\\classes";
 

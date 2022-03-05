@@ -1,5 +1,7 @@
 package de.fraunhofer.iem.util;
 
+import de.fraunhofer.iem.exception.DtsSerializeUtilException;
+
 import java.io.*;
 
 /**
@@ -8,7 +10,14 @@ import java.io.*;
  * @author Ranjith Krishnamurthy
  */
 public class SerializableUtility {
-    public static void serialize(EdgesInAGraph edgesInAGraph, String filename) {
+    /**
+     * Serialize the given dynamic traces (EdgesInAGraph object)
+     *
+     * @param edgesInAGraph Dynamic Traces (EdgesInAGraph object)
+     * @param filename      serialize DTS file location
+     * @throws DtsSerializeUtilException Serializable utility failed to serialize DTS file
+     */
+    public static void serialize(EdgesInAGraph edgesInAGraph, String filename) throws DtsSerializeUtilException {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filename + ".ser");
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -18,11 +27,18 @@ public class SerializableUtility {
             objectOutputStream.close();
             fileOutputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new DtsSerializeUtilException("Failed to serialize to DTS file. \nMessage = " + e.getMessage());
         }
     }
 
-    public static EdgesInAGraph deSerialize(String filename) {
+    /**
+     * Deserialize the given dynamic traces (EdgesInAGraph object)
+     *
+     * @param filename serialized DTS file location
+     * @return Dynamic Traces (EdgesInAGraph object)
+     * @throws DtsSerializeUtilException Serializable utility failed to deserialize DTS file
+     */
+    public static EdgesInAGraph deSerialize(String filename) throws DtsSerializeUtilException {
         EdgesInAGraph edgesInAGraph = null;
 
         try {
@@ -34,7 +50,11 @@ public class SerializableUtility {
             fileInputStream.close();
             objectInputStream.close();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new DtsSerializeUtilException("Failed to deserialize to DTS file. \nMessage = " + e.getMessage());
+        }
+
+        if (edgesInAGraph == null) {
+            throw new DtsSerializeUtilException("Failed to deserialize to DTS file. Got null object after deserialization.");
         }
 
         return edgesInAGraph;
