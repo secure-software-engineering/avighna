@@ -27,7 +27,7 @@ public class TestTheLibrary {
 
         String dtsFileName = "D:\\cgbench\\CGBench\\bean\\output\\dynamic_cg.dst";
 
-        new HybridCallGraph().merge(dtsFileName, Scene.v().getCallGraph(), "callgraph", "callgraph", ImageType.PNG);
+        new HybridCallGraph().merge(dtsFileName, Scene.v().getCallGraph(), "callgraph", "callgraph", ImageType.SVG);
     }
 
     /**
