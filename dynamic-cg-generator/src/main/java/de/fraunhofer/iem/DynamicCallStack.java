@@ -2,13 +2,13 @@ package de.fraunhofer.iem;
 
 
 import de.fraunhofer.iem.util.*;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
-import org.apache.commons.io.IOUtils;
 import soot.util.dot.DotGraphEdge;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 
@@ -66,10 +66,6 @@ public class DynamicCallStack {
             if (methodSignature.startsWith(associatedLibraryCallStack.get(associatedLibraryCallStack.size() - 1))) {
                 associatedLibraryCallStack.remove(associatedLibraryCallStack.size() - 1);
                 isAssociatedLibraryCallPresent = false;
-//                System.out.println("*** Library Return Call ***");
-//                System.out.println("CS = " + continuousCallStack);
-//                System.out.println("LCS = " + associatedLibraryCallStack);
-//                System.out.println("*** Library Return Call ***");
             }
         }
     }
@@ -87,32 +83,9 @@ public class DynamicCallStack {
                     if (sourceNode.split(":")[0].trim().startsWith(methodThatCalledLibraryMethod + "(")) {
                         this.associatedLibraryCallStack.add(methodSignature);
                         isAssociatedLibraryCallPresent = true;
-//                        System.out.println("*** Library Call ***");
-//                        System.out.println("CS = " + continuousCallStack);
-//                        System.out.println("LCS = " + associatedLibraryCallStack);
-//                        System.out.println("*** Library Call ***");
                     }
                 }
             }
-
-//            new Scanner(System.in).next();
-//            for (int index = 0; index < stackTraceElements.length; ++index) {
-//                StackTraceElement stackTraceElement = stackTraceElements[index];
-//                String currentMethodSignature = stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName();
-//
-//                if (sourceNode.split(":")[0].trim().startsWith(currentMethodSignature + "(")) {
-//                    String nextMethodSignature = stackTraceElements[index - 1].getClassName() + "." + stackTraceElements[index - 1].getMethodName();
-//
-//                    if (methodSignature.startsWith(nextMethodSignature + "(")) {
-//                        this.associatedLibraryCallStack.add(methodSignature);
-//                        isAssociatedLibraryCallPresent = true;
-//                        System.out.println("*** Library Call ***");
-//                        System.out.println("CS = " + continousCallStack);
-//                        System.out.println("LCS = " + associatedLibraryCallStack);
-//                        System.out.println("*** Library Call ***");
-//                    }
-//                }
-//            }
         }
     }
 
@@ -125,10 +98,6 @@ public class DynamicCallStack {
     public void methodCall(String methodSignature) {
         if (this.continuousCallStack.size() == 0) {
             this.continuousCallStack.add(methodSignature);
-//            System.out.println("*** Application Call ***");
-//            System.out.println("CS = " + continuousCallStack);
-//            System.out.println("LCS = " + associatedLibraryCallStack);
-//            System.out.println("*** Application Call ***");
 
         } else {
             String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
@@ -155,10 +124,6 @@ public class DynamicCallStack {
                 }
             }
 
-//            if (destinationNode == null) {
-//                destinationNode = methodSignature + " : -1[]";
-//            }
-
             if (isFakeEdge(methodSignature)) isFakeEdge = true;
             else if (isFakeEdge(sourceNode)) {
                 isFakeEdge = true;
@@ -182,10 +147,8 @@ public class DynamicCallStack {
                 this.isAssociatedLibraryCallPresent = false;
             } else if (isCallSiteSameAsCaller) {
                 associatedLibraryCall = methodSignature;
-//                this.associatedLibraryCallStack.add(associatedLibraryCall);
             } else {
                 associatedLibraryCall = "NA";
-//                this.associatedLibraryCallStack.add("NA");
             }
 
             edgesInAGraph.addDirectedEdge(new DirectedEdge(sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller));
@@ -200,10 +163,6 @@ public class DynamicCallStack {
             }
 
             this.continuousCallStack.add(methodSignature);
-//            System.out.println("*** Application Call ***");
-//            System.out.println("CS = " + continuousCallStack);
-//            System.out.println("LCS = " + associatedLibraryCallStack);
-//            System.out.println("*** Application Call ***");
         }
     }
 
@@ -266,11 +225,6 @@ public class DynamicCallStack {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
         }
-
-//        System.out.println("*** Return Call ***");
-//        System.out.println("CS = " + continuousCallStack);
-//        System.out.println("LCS = " + associatedLibraryCallStack);
-//        System.out.println("*** Return Call ***");
     }
 
     private String readFromInputStream(InputStream inputStream) throws IOException {
