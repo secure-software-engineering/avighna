@@ -60,7 +60,6 @@ public class CommandLineUtility {
                 LIST_OF_REQUEST_LONG,
                 true,
                 "Path of the YAML file that contains the list of requests. Request must be full curl command");
-        reqFile.setRequired(true);
 
         Option outDir = new Option(
                 OUT_ROOT_DIR_SHORT,
@@ -117,7 +116,6 @@ public class CommandLineUtility {
     public static void validateCommandLineOptions() {
         String appJarFilePath = commandLine.getOptionValue(CommandLineUtility.APP_JAR_LONG);
         String jarFilePath = commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG);
-        String reqFilePath = commandLine.getOptionValue(CommandLineUtility.LIST_OF_REQUEST_LONG);
         String outDirPath = commandLine.getOptionValue(CommandLineUtility.OUT_ROOT_DIR_LONG);
 
         // Verify given app jar file path
@@ -156,8 +154,12 @@ public class CommandLineUtility {
             System.exit(-1);
         }
 
-        //Verify given request file path and set the requestFile
-        MainInterface.requestFile.setRequests(YamlUtility.parseRequestYamlFile(reqFilePath).getRequests());
+        if (commandLine.hasOption(CommandLineUtility.LIST_OF_REQUEST_LONG)) {
+            String reqFilePath = commandLine.getOptionValue(CommandLineUtility.LIST_OF_REQUEST_LONG);
+
+            //Verify given request file path and set the requestFile
+            MainInterface.requestFile.setRequests(YamlUtility.parseRequestYamlFile(reqFilePath).getRequests());
+        }
 
         // Verify given output dir
         File outDir = new File(outDirPath);

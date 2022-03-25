@@ -10,6 +10,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -105,13 +106,33 @@ public class MainInterface {
             e.printStackTrace();
         }
 
-        for (String request : requestFile.getRequests()) {
-            try {
-                System.out.println("Executing = " + request);
-                Runtime.getRuntime().exec(request).waitFor();
-                Thread.sleep(3000);
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+        if (!CommandLineUtility.getCommandLine().hasOption(CommandLineUtility.LIST_OF_REQUEST_LONG)) {
+            System.out.println("Spring application is up and running with the provided agent. " +
+                    "\nPlease open browser and run different requests");
+
+            String closeApp = "n";
+
+            while (!closeApp.toLowerCase().equals("y") && !closeApp.toLowerCase().equals("yes")) {
+                System.out.print("Completed? Should we terminate the application and generate DTS file?   ");
+                Scanner scanner = new Scanner(System.in);
+
+                closeApp = scanner.nextLine();
+
+                if (closeApp == null || closeApp.equals("")) {
+                    closeApp = "n";
+                }
+            }
+        } else {
+            System.out.println("Spring application is up and running with the provided agent. " +
+                    "\nSending the provided requests");
+            for (String request : requestFile.getRequests()) {
+                try {
+                    System.out.println("Executing = " + request);
+                    Runtime.getRuntime().exec(request).waitFor();
+                    Thread.sleep(3000);
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
