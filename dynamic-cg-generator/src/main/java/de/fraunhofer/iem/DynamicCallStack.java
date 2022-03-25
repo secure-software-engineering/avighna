@@ -71,7 +71,7 @@ public class DynamicCallStack {
     }
 
     public void libraryCall(String methodSignature) {
-        if (!isAssociatedLibraryCallPresent && this.continuousCallStack.size() != 0) {
+        if (!isAssociatedLibraryCallPresent && this.continuousCallStack.size() > 0) {
             StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
             String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
 
@@ -132,18 +132,22 @@ public class DynamicCallStack {
             dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
 
             if (isAssociatedLibraryCallPresent) {
-                String temp = this.associatedLibraryCallStack.get(this.associatedLibraryCallStack.size() - 1);
+                if (this.associatedLibraryCallStack.size() > 0) {
+                    String temp = this.associatedLibraryCallStack.get(this.associatedLibraryCallStack.size() - 1);
 
-                if (nextMethodSignature != null) {
-                    if (!temp.startsWith(nextMethodSignature + "(")) {
-                        associatedLibraryCall = nextMethodSignature;
+                    if (nextMethodSignature != null) {
+                        if (!temp.startsWith(nextMethodSignature + "(")) {
+                            associatedLibraryCall = nextMethodSignature;
+                        } else {
+                            associatedLibraryCall = temp;
+                        }
                     } else {
                         associatedLibraryCall = temp;
                     }
-                } else {
-                    associatedLibraryCall = temp;
-                }
 
+                } else {
+                    associatedLibraryCall = nextMethodSignature;
+                }
                 this.isAssociatedLibraryCallPresent = false;
             } else if (isCallSiteSameAsCaller) {
                 associatedLibraryCall = methodSignature;

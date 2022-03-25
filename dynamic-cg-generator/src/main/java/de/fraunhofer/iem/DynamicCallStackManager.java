@@ -39,20 +39,25 @@ public class DynamicCallStackManager {
      * @param isLibraryCall   Is the method a library code
      */
     public static void methodCall(String methodSignature, boolean isLibraryCall) {
-        DynamicCallStack dynamicCallStack = getDynamicCallStack();
+        try {
+            DynamicCallStack dynamicCallStack = getDynamicCallStack();
 
-        if (dynamicCallStack == null) {
-            if (isLibraryCall) return;
+            if (dynamicCallStack == null) {
+                if (isLibraryCall) return;
 
-            dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
-            myDynamicCallStack.add(dynamicCallStack);
-            LoggerUtil.getLOGGER().info("Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId());
-        }
+                dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
+                myDynamicCallStack.add(dynamicCallStack);
+                LoggerUtil.getLOGGER().info("Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId());
+            }
 
-        if (isLibraryCall) {
-            dynamicCallStack.libraryCall(methodSignature);
-        } else {
-            dynamicCallStack.methodCall(methodSignature);
+            if (isLibraryCall) {
+                dynamicCallStack.libraryCall(methodSignature);
+            } else {
+                dynamicCallStack.methodCall(methodSignature);
+            }
+        } catch (Exception | Error e) {
+            LoggerUtil.getLOGGER().log(Level.SEVERE, "Error = " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -63,20 +68,25 @@ public class DynamicCallStackManager {
      * @param isLibraryCall   Is the method a library code
      */
     public static void methodReturn(String methodSignature, boolean isLibraryCall) {
-        DynamicCallStack dynamicCallStack = getDynamicCallStack();
+        try {
+            DynamicCallStack dynamicCallStack = getDynamicCallStack();
 
-        if (dynamicCallStack == null) {
-            if (isLibraryCall) return;
+            if (dynamicCallStack == null) {
+                if (isLibraryCall) return;
 
-            dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
-            LoggerUtil.getLOGGER().log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
-                    "However, it happened in methodReturn, Please check the logic.");
-        }
+                dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
+                LoggerUtil.getLOGGER().log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
+                        "However, it happened in methodReturn, Please check the logic.");
+            }
 
-        if (isLibraryCall) {
-            dynamicCallStack.libraryReturnCall(methodSignature);
-        } else {
-            dynamicCallStack.methodReturn(methodSignature);
+            if (isLibraryCall) {
+                dynamicCallStack.libraryReturnCall(methodSignature);
+            } else {
+                dynamicCallStack.methodReturn(methodSignature);
+            }
+        } catch (Exception | Error e) {
+            LoggerUtil.getLOGGER().log(Level.SEVERE, "Error = " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
