@@ -38,6 +38,7 @@ public class AgentTransformer implements ClassFileTransformer {
         this.exclude.add("de/fraunhofer/iem/util/FakeSerializableDotGraph");
         this.exclude.add("de/fraunhofer/iem/util/SerializableDotGraph");
         this.exclude.add("de/fraunhofer/iem/util/SerializableUtility");
+        this.exclude.add("de/fraunhofer/iem/util/LoggerUtil");
         //TODO: the below will cause termination of the tool, test it and fix it
 //        exclude.add("de/fraunhofer/iem/springbench/bean/configurations/MyConfiguration$$EnhancerBySpringCGLIB");
     }
