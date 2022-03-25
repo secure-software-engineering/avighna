@@ -99,6 +99,25 @@ public class DynamicCallStack {
         if (this.continuousCallStack.size() == 0) {
             this.continuousCallStack.add(methodSignature);
 
+            // add a fake edge to represent the first call is from the spring boot framework
+            String sourceNode = "fakeMethod";
+            String associatedLibraryCall = "sameAsCalleeMethod_Fake";
+
+
+            edgesInAGraph.addDirectedEdge(new DirectedEdge(
+                    sourceNode,
+                    methodSignature,
+                    associatedLibraryCall,
+                    -1,
+                    true,
+                    true));
+
+            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
+
+            dotGraphEdge.setLabel(-1 + "[" + associatedLibraryCall + "]");
+
+            dotGraphEdge.setAttribute("color", "red");
+            dotGraphEdge.setStyle("dashed");
         } else {
             String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
             String associatedLibraryCall = null;
