@@ -221,7 +221,7 @@ public class DynamicCallStack {
                 new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot")
                         .delete();
             }
-        } else {
+        } else if (this.continuousCallStack.size() > 0) {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
         }
