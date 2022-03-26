@@ -3,9 +3,11 @@ package de.fraunhofer.iem;
 import de.fraunhofer.iem.util.DynamicAgentConfiguration;
 import de.fraunhofer.iem.util.LoggerUtil;
 import de.fraunhofer.iem.util.YamlUtil;
-import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
 import java.net.JarURLConnection;
 import java.util.logging.Level;
