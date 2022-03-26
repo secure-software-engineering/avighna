@@ -25,11 +25,6 @@
             <version>${java-assist-version}</version>
         </dependency>
         <dependency>
-            <groupId>de.fraunhofer.iem</groupId>
-            <artifactId>hybridCG-merger</artifactId>
-            <version>${current-version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>${yaml-version}</version>
