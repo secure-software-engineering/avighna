@@ -29,7 +29,7 @@ public class DynamicCallStack {
     private final List<String> associatedLibraryCallStack;
     private boolean isAssociatedLibraryCallPresent;
 //    private final SerializableDotGraph dotGraph;
-//    private final EdgesInAGraph edgesInAGraph;
+    private final EdgesInAGraph edgesInAGraph;
     public static final Set<String> fakeEdges = new HashSet<>();
     public static String outputRootDirectory;
     public static boolean saveCallGraphAsDotFile;
@@ -48,7 +48,7 @@ public class DynamicCallStack {
         this.associatedLibraryCallStack = new ArrayList<>();
         this.isAssociatedLibraryCallPresent = false;
 //        this.dotGraph = new SerializableDotGraph();
-//        this.edgesInAGraph = new EdgesInAGraph("callgraph", null);
+        this.edgesInAGraph = new EdgesInAGraph("callgraph", null);
     }
 
     /**
@@ -103,13 +103,13 @@ public class DynamicCallStack {
             String associatedLibraryCall = "sameAsCalleeMethod_Fake";
 
 
-//            edgesInAGraph.addDirectedEdge(new DirectedEdge(
-//                    sourceNode,
-//                    methodSignature,
-//                    associatedLibraryCall,
-//                    -1,
-//                    true,
-//                    true));
+            edgesInAGraph.addDirectedEdge(new DirectedEdge(
+                    sourceNode,
+                    methodSignature,
+                    associatedLibraryCall,
+                    -1,
+                    true,
+                    true));
 
 //            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
 //
@@ -225,7 +225,7 @@ public class DynamicCallStack {
 
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
 
-//            SerializableUtility.serialize(edgesInAGraph, outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid);
+            SerializableUtility.serialize(edgesInAGraph, outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid);
 
             LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
 
