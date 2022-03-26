@@ -2,7 +2,6 @@ package de.fraunhofer.iem;
 
 
 import de.fraunhofer.iem.util.*;
-import soot.util.dot.DotGraphEdge;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class DynamicCallStack {
     private final List<String> continuousCallStack;
     private final List<String> associatedLibraryCallStack;
     private boolean isAssociatedLibraryCallPresent;
-    private final SerializableDotGraph dotGraph;
+//    private final SerializableDotGraph dotGraph;
     private final EdgesInAGraph edgesInAGraph;
     public static final Set<String> fakeEdges = new HashSet<>();
     public static String outputRootDirectory;
@@ -48,8 +47,8 @@ public class DynamicCallStack {
         this.continuousCallStack = new ArrayList<>();
         this.associatedLibraryCallStack = new ArrayList<>();
         this.isAssociatedLibraryCallPresent = false;
-        this.dotGraph = new SerializableDotGraph();
-        this.edgesInAGraph = new EdgesInAGraph("callgraph", dotGraph);
+//        this.dotGraph = new SerializableDotGraph();
+        this.edgesInAGraph = new EdgesInAGraph("callgraph", null);
     }
 
     /**
@@ -112,16 +111,16 @@ public class DynamicCallStack {
                     true,
                     true));
 
-            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
-
-            dotGraphEdge.setLabel(-1 + "[" + associatedLibraryCall + "]");
-
-            dotGraphEdge.setAttribute("color", "red");
-            dotGraphEdge.setStyle("dashed");
+//            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
+//
+//            dotGraphEdge.setLabel(-1 + "[" + associatedLibraryCall + "]");
+//
+//            dotGraphEdge.setAttribute("color", "red");
+//            dotGraphEdge.setStyle("dashed");
         } else {
             String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
             String associatedLibraryCall = null;
-            DotGraphEdge dotGraphEdge = null;
+//            DotGraphEdge dotGraphEdge = null;
             boolean isFakeEdge = false;
             boolean isCallSiteSameAsCaller = false;
             String nextMethodSignature = null;
@@ -148,7 +147,7 @@ public class DynamicCallStack {
                 isFakeEdge = true;
             }
 
-            dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
+//            dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
 
             if (isAssociatedLibraryCallPresent) {
                 if (this.associatedLibraryCallStack.size() > 0) {
@@ -174,16 +173,16 @@ public class DynamicCallStack {
                 associatedLibraryCall = "NA";
             }
 
-            edgesInAGraph.addDirectedEdge(new DirectedEdge(sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller));
-
-            dotGraphEdge.setLabel(lineNumber + "[" + associatedLibraryCall + "]");
-
-            if (!isCallSiteSameAsCaller) dotGraphEdge.setAttribute("color", "red");
-
-            if (isFakeEdge) {
-                dotGraphEdge.setStyle("dashed");
-                dotGraphEdge.setAttribute("color", "red");
-            }
+//            edgesInAGraph.addDirectedEdge(new DirectedEdge(sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller));
+//
+//            dotGraphEdge.setLabel(lineNumber + "[" + associatedLibraryCall + "]");
+//
+//            if (!isCallSiteSameAsCaller) dotGraphEdge.setAttribute("color", "red");
+//
+//            if (isFakeEdge) {
+//                dotGraphEdge.setStyle("dashed");
+//                dotGraphEdge.setAttribute("color", "red");
+//            }
 
             this.continuousCallStack.add(methodSignature);
         }
@@ -230,20 +229,20 @@ public class DynamicCallStack {
 
             LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
 
-            if (saveCallGraphAsDotFile || saveCallGraphAsImage) {
-                dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
-                LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
-            }
-
-            if (saveCallGraphAsImage) {
-                saveDotAsSVG(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot", outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg");
-                LoggerUtil.getLOGGER().info("SVG file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg").getAbsolutePath().toString());
-            }
-
-            if (saveCallGraphAsImage && !saveCallGraphAsDotFile) {
-                new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot")
-                        .delete();
-            }
+//            if (saveCallGraphAsDotFile || saveCallGraphAsImage) {
+//                dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
+//                LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
+//            }
+//
+//            if (saveCallGraphAsImage) {
+//                saveDotAsSVG(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot", outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg");
+//                LoggerUtil.getLOGGER().info("SVG file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg").getAbsolutePath().toString());
+//            }
+//
+//            if (saveCallGraphAsImage && !saveCallGraphAsDotFile) {
+//                new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot")
+//                        .delete();
+//            }
         } else if (this.continuousCallStack.size() > 0) {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
@@ -289,41 +288,41 @@ public class DynamicCallStack {
         callStack.clear();
     }
 
-    public static String dotToSvgJarPath = null;
-
-    /**
-     * This method converts the given dot file into image file
-     *
-     * @param dotFileName         Dot file name
-     * @param outputImageFileName Image file name
-     */
-    private void saveDotAsSVG(String dotFileName, String outputImageFileName) {
-        if (dotToSvgJarPath == null) {
-            LoggerUtil.getLOGGER().log(Level.WARNING, "Can not generates SVG file");
-            return;
-        }
-
-        try {
-            String command = "java -jar " + dotToSvgJarPath + " " + dotFileName + " " + outputImageFileName;
-
-            Process proc = Runtime.getRuntime().exec(command);
-
-            InputStream err = proc.getErrorStream();
-
-            BufferedReader inn = new BufferedReader(new InputStreamReader(err));
-            String message = null;
-            String line = null;
-            while ((line = inn.readLine()) != null) {
-                if (message == null) message = line + "\n";
-
-                message += line + "\n";
-            }
-
-            if (line != null) {
-                LoggerUtil.getLOGGER().log(Level.WARNING, "Some error occurred while generating SVG file = Message from external Jar is = " + message);
-            }
-        } catch (IOException e) {
-            LoggerUtil.getLOGGER().log(Level.WARNING, "Some error occurred while generating SVG file = " + e.getMessage());
-        }
-    }
+//    public static String dotToSvgJarPath = null;
+//
+//    /**
+//     * This method converts the given dot file into image file
+//     *
+//     * @param dotFileName         Dot file name
+//     * @param outputImageFileName Image file name
+//     */
+//    private void saveDotAsSVG(String dotFileName, String outputImageFileName) {
+//        if (dotToSvgJarPath == null) {
+//            LoggerUtil.getLOGGER().log(Level.WARNING, "Can not generates SVG file");
+//            return;
+//        }
+//
+//        try {
+//            String command = "java -jar " + dotToSvgJarPath + " " + dotFileName + " " + outputImageFileName;
+//
+//            Process proc = Runtime.getRuntime().exec(command);
+//
+//            InputStream err = proc.getErrorStream();
+//
+//            BufferedReader inn = new BufferedReader(new InputStreamReader(err));
+//            String message = null;
+//            String line = null;
+//            while ((line = inn.readLine()) != null) {
+//                if (message == null) message = line + "\n";
+//
+//                message += line + "\n";
+//            }
+//
+//            if (line != null) {
+//                LoggerUtil.getLOGGER().log(Level.WARNING, "Some error occurred while generating SVG file = Message from external Jar is = " + message);
+//            }
+//        } catch (IOException e) {
+//            LoggerUtil.getLOGGER().log(Level.WARNING, "Some error occurred while generating SVG file = " + e.getMessage());
+//        }
+//    }
 }
