@@ -1,5 +1,6 @@
 package de.fraunhofer.iem;
 
+import de.fraunhofer.iem.util.LoggerUtil;
 import javassist.*;
 
 import java.io.BufferedWriter;
@@ -45,6 +46,10 @@ public class AgentTransformer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+        if (loader == null || className == null) {
+            return classfileBuffer;
+        }
+
         for (String excludeString : exclude) {
             if (className.startsWith(excludeString)) {
                 return classfileBuffer;
@@ -52,36 +57,57 @@ public class AgentTransformer implements ClassFileTransformer {
         }
 
         if (className.startsWith(this.rootPackageNameOfApplication)) {
-            return enhanceClass(className, classfileBuffer, false);
+            return enhanceClass(className, classfileBuffer, false, loader);
         } else {
-            return enhanceClass(className, classfileBuffer, true);
+            return enhanceClass(className, classfileBuffer, true, loader);
         }
     }
 
-    private byte[] enhanceClass(String className, byte[] classfileBuffer, boolean isLibraryCall) {
+    private byte[] enhanceClass(String className, byte[] classfileBuffer, boolean isLibraryCall, ClassLoader classLoader) {
         String currentlyProcessingMethod = "";
         ClassPool pool = ClassPool.getDefault();
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        pool.insertClassPath(new LoaderClassPath(cl));
+        pool.appendClassPath(new LoaderClassPath(classLoader));
         CtClass clazz = null;
-        byte[] byteCode = classfileBuffer;
+
         try {
-            clazz = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
-            if (!clazz.isInterface()) {
-                CtMethod[] methodss = clazz.getDeclaredMethods();
-                for (CtMethod method : methodss) {
-                    currentlyProcessingMethod = method.getLongName();
-                    if (!method.isEmpty()) {
-                        String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + method.getLongName() + "\"," + isLibraryCall + ");";
-                        method.insertBefore(beforeCode);
+            clazz = pool.get(className.replaceAll("/", "."));
+        } catch (NotFoundException | NoClassDefFoundError e) {
+            return classfileBuffer;
+        }
 
-                        String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + method.getLongName() + "\"," + isLibraryCall + ");";
-                        method.insertAfter(afterCode);
-                    }
+        if (clazz == null) { //class not found
+            return classfileBuffer;
+        }
+
+        byte[] byteCode;
+
+        try {
+//            clazz = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
+//            if (!clazz.isInterface()) {
+            CtMethod[] methodss = clazz.getDeclaredMethods();
+            for (CtMethod method : methodss) {
+                currentlyProcessingMethod = method.getLongName();
+                if (!method.isEmpty() && !Modifier.isNative(method.getModifiers())) {
+                    String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + method.getLongName() + "\"," + isLibraryCall + ");";
+                    method.insertBefore(beforeCode);
+
+                    String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + method.getLongName() + "\"," + isLibraryCall + ");";
+                    method.insertAfter(afterCode);
                 }
-
-                byteCode = clazz.toBytecode();
             }
+
+            CtConstructor[] constructorMethods = clazz.getConstructors();
+            for (CtConstructor constructorMethod : constructorMethods) {
+                currentlyProcessingMethod = constructorMethod.getLongName();
+                String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + constructorMethod.getLongName() + "\"," + isLibraryCall + ");";
+                constructorMethod.insertBefore(beforeCode);
+
+                String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + constructorMethod.getLongName() + "\"," + isLibraryCall + ");";
+                constructorMethod.insertAfter(afterCode);
+            }
+
+            byteCode = clazz.toBytecode();
+//            }
         } catch (CannotCompileException | IOException e) {
             try {
                 BufferedWriter out = new BufferedWriter(new FileWriter(
