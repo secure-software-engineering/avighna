@@ -2,6 +2,7 @@ package de.fraunhofer.iem;
 
 
 import de.fraunhofer.iem.util.*;
+import soot.util.dot.DotGraphEdge;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class DynamicCallStack {
     private final List<String> continuousCallStack;
     private final List<String> associatedLibraryCallStack;
     private boolean isAssociatedLibraryCallPresent;
-//    private final SerializableDotGraph dotGraph;
+    private final SerializableDotGraph dotGraph;
     private final EdgesInAGraph edgesInAGraph;
     public static final Set<String> fakeEdges = new HashSet<>();
     public static String outputRootDirectory;
@@ -47,7 +48,7 @@ public class DynamicCallStack {
         this.continuousCallStack = new ArrayList<>();
         this.associatedLibraryCallStack = new ArrayList<>();
         this.isAssociatedLibraryCallPresent = false;
-//        this.dotGraph = new SerializableDotGraph();
+        this.dotGraph = new SerializableDotGraph();
         this.edgesInAGraph = new EdgesInAGraph("callgraph", null);
     }
 
@@ -71,20 +72,25 @@ public class DynamicCallStack {
 
     public void libraryCall(String methodSignature) {
         if (!isAssociatedLibraryCallPresent && this.continuousCallStack.size() > 0) {
-            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-            String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
+            this.associatedLibraryCallStack.add(methodSignature);
+            isAssociatedLibraryCallPresent = true;
 
-            if (stackTraceElements.length > 5) {
-                String calledLibraryMethod = stackTraceElements[3].getClassName() + "." + stackTraceElements[3].getMethodName();
-                String methodThatCalledLibraryMethod = stackTraceElements[4].getClassName() + "." + stackTraceElements[4].getMethodName();
-
-                if (methodSignature.startsWith(calledLibraryMethod + "(")) {
-                    if (sourceNode.split(":")[0].trim().startsWith(methodThatCalledLibraryMethod + "(")) {
-                        this.associatedLibraryCallStack.add(methodSignature);
-                        isAssociatedLibraryCallPresent = true;
-                    }
-                }
-            }
+//            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+//            String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
+//
+//            if (stackTraceElements.length > 5) {
+//                String calledLibraryMethod = stackTraceElements[3].getClassName() + "." + stackTraceElements[3].getMethodName();
+//                String methodThatCalledLibraryMethod = stackTraceElements[4].getClassName() + "." + stackTraceElements[4].getMethodName();
+//
+//                String temp = methodSignature.split(": ")[0].replace("<", "") +
+//                        "." + methodSignature.split(": ")[1].split(" ")[1].replace(">", "");
+//                if (temp.startsWith(calledLibraryMethod + "(")) {
+//                    if (sourceNode.split(":")[0].trim().startsWith(methodThatCalledLibraryMethod + "(")) {
+//                        this.associatedLibraryCallStack.add(methodSignature);
+//                        isAssociatedLibraryCallPresent = true;
+//                    }
+//                }
+//            }
         }
     }
 
@@ -120,34 +126,37 @@ public class DynamicCallStack {
         } else {
             String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
             String associatedLibraryCall = null;
-//            DotGraphEdge dotGraphEdge = null;
+            DotGraphEdge dotGraphEdge = null;
             boolean isFakeEdge = false;
             boolean isCallSiteSameAsCaller = false;
             String nextMethodSignature = null;
             int lineNumber = -1;
 
-            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-
-            for (int index = 0; index < stackTraceElements.length; ++index) {
-                StackTraceElement stackTraceElement = stackTraceElements[index];
-                String currentMethodSignature = stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName();
-
-                if (sourceNode.split(":")[0].trim().startsWith(currentMethodSignature + "(")) {
-                    nextMethodSignature = stackTraceElements[index - 1].getClassName() + "." + stackTraceElements[index - 1].getMethodName();
-                    lineNumber = stackTraceElement.getLineNumber();
-
-                    if (methodSignature.startsWith(nextMethodSignature + "(")) {
-                        isCallSiteSameAsCaller = true;
-                    }
-                }
-            }
+//            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+//
+//            for (int index = 0; index < stackTraceElements.length; ++index) {
+//                StackTraceElement stackTraceElement = stackTraceElements[index];
+//                String currentMethodSignature = stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName();
+//
+//                String temp = methodSignature.split(": ")[0].replace("<", "") +
+//                        "." + methodSignature.split(": ")[1].split(" ")[1].replace(">", "");
+//
+//                if (temp.startsWith(currentMethodSignature + "(")) {
+//                    nextMethodSignature = stackTraceElements[index - 1].getClassName() + "." + stackTraceElements[index - 1].getMethodName();
+//                    lineNumber = stackTraceElement.getLineNumber();
+//
+//                    if (methodSignature.startsWith(nextMethodSignature + "(")) {
+//                        isCallSiteSameAsCaller = true;
+//                    }
+//                }
+//            }
 
             if (isFakeEdge(methodSignature)) isFakeEdge = true;
             else if (isFakeEdge(sourceNode)) {
                 isFakeEdge = true;
             }
 
-//            dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
+            dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
 
             if (isAssociatedLibraryCallPresent) {
                 if (this.associatedLibraryCallStack.size() > 0) {
@@ -173,16 +182,16 @@ public class DynamicCallStack {
                 associatedLibraryCall = "NA";
             }
 
-//            edgesInAGraph.addDirectedEdge(new DirectedEdge(sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller));
-//
-//            dotGraphEdge.setLabel(lineNumber + "[" + associatedLibraryCall + "]");
-//
-//            if (!isCallSiteSameAsCaller) dotGraphEdge.setAttribute("color", "red");
-//
-//            if (isFakeEdge) {
-//                dotGraphEdge.setStyle("dashed");
-//                dotGraphEdge.setAttribute("color", "red");
-//            }
+            edgesInAGraph.addDirectedEdge(new DirectedEdge(sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller));
+
+            dotGraphEdge.setLabel(lineNumber + "[" + associatedLibraryCall + "]");
+
+            if (!isCallSiteSameAsCaller) dotGraphEdge.setAttribute("color", "red");
+
+            if (isFakeEdge) {
+                dotGraphEdge.setStyle("dashed");
+                dotGraphEdge.setAttribute("color", "red");
+            }
 
             this.continuousCallStack.add(methodSignature);
         }
@@ -229,10 +238,10 @@ public class DynamicCallStack {
 
             LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
 
-//            if (saveCallGraphAsDotFile || saveCallGraphAsImage) {
-//                dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
-//                LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
-//            }
+            if (saveCallGraphAsDotFile || saveCallGraphAsImage) {
+                dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
+                LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
+            }
 //
 //            if (saveCallGraphAsImage) {
 //                saveDotAsSVG(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot", outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg");
