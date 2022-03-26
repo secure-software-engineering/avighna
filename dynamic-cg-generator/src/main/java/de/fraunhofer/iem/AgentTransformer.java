@@ -67,21 +67,30 @@ public class AgentTransformer implements ClassFileTransformer {
         byte[] byteCode = classfileBuffer;
         try {
             clazz = pool.makeClass(new ByteArrayInputStream(classfileBuffer));
-            if (!clazz.isInterface()) {
-                CtMethod[] methodss = clazz.getDeclaredMethods();
-                for (CtMethod method : methodss) {
-                    currentlyProcessingMethod = method.getLongName();
-                    if (!method.isEmpty()) {
-                        String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + method.getLongName() + "\"," + isLibraryCall + ");";
-                        method.insertBefore(beforeCode);
 
-                        String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + method.getLongName() + "\"," + isLibraryCall + ");";
-                        method.insertAfter(afterCode);
-                    }
+            CtMethod[] methodss = clazz.getDeclaredMethods();
+            for (CtMethod method : methodss) {
+                currentlyProcessingMethod = method.getLongName();
+                if (!method.isEmpty() && !Modifier.isNative(method.getModifiers())) {
+                    String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + method.getLongName() + "\"," + isLibraryCall + ");";
+                    method.insertBefore(beforeCode);
+
+                    String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + method.getLongName() + "\"," + isLibraryCall + ");";
+                    method.insertAfter(afterCode);
                 }
-
-                byteCode = clazz.toBytecode();
             }
+
+            CtConstructor[] constructorMethods = clazz.getConstructors();
+            for (CtConstructor constructorMethod : constructorMethods) {
+                currentlyProcessingMethod = constructorMethod.getLongName();
+                String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + constructorMethod.getLongName() + "\"," + isLibraryCall + ");";
+                constructorMethod.insertBefore(beforeCode);
+
+                String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + constructorMethod.getLongName() + "\"," + isLibraryCall + ");";
+                constructorMethod.insertAfter(afterCode);
+            }
+
+            byteCode = clazz.toBytecode();
         } catch (CannotCompileException | IOException e) {
             try {
                 BufferedWriter out = new BufferedWriter(new FileWriter(
