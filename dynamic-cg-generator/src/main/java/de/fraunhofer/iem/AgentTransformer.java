@@ -45,6 +45,10 @@ public class AgentTransformer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+        if (loader == null || className == null || className.equals("null")) {
+            return classfileBuffer;
+        }
+
         for (String excludeString : exclude) {
             if (className.startsWith(excludeString)) {
                 return classfileBuffer;
