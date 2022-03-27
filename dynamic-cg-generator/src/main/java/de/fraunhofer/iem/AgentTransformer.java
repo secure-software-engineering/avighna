@@ -140,7 +140,6 @@ public class AgentTransformer implements ClassFileTransformer {
         StringBuilder signature = new StringBuilder();
 
         return signature
-                .append("<")
                 .append(className)
                 .append(": ")
                 .append(returnType)
@@ -148,7 +147,7 @@ public class AgentTransformer implements ClassFileTransformer {
                 .append(methodName)
                 .append("(")
                 .append(parametersType)
-                .append(")>")
+                .append(")")
                 .toString();
     }
 }
