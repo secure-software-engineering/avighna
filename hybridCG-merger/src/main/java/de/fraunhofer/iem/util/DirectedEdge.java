@@ -73,4 +73,57 @@ public class DirectedEdge implements Serializable {
     public void setCallSiteSameAsCaller(boolean callSiteSameAsCaller) {
         isCallSiteSameAsCaller = callSiteSameAsCaller;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((source == null) ? 0 : source.hashCode());
+        result = prime * result + ((destination == null) ? 0 : destination.hashCode());
+        result = prime * result + ((associatedCallSite == null) ? 0 : associatedCallSite.hashCode());
+        result = prime * result + Integer.hashCode(associatedCallSiteLineNumber);
+        result = prime * result + Boolean.hashCode(isFakeEdge);
+        result = prime * result + Boolean.hashCode(isCallSiteSameAsCaller);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+
+        DirectedEdge other = (DirectedEdge) obj;
+
+        if (source == null) {
+            if (other.getSource() != null)
+                return false;
+        } else if (!source.equals(other.getSource()))
+            return false;
+
+        if (destination == null) {
+            if (other.getDestination() != null)
+                return false;
+        } else if (!destination.equals(other.getDestination()))
+            return false;
+
+        if (associatedCallSite == null) {
+            if (other.getAssociatedCallSite() != null)
+                return false;
+        } else if (!associatedCallSite.equals(other.getAssociatedCallSite()))
+            return false;
+
+        if (associatedCallSiteLineNumber != other.getAssociatedCallSiteLineNumber())
+            return false;
+
+        if (isFakeEdge != other.isFakeEdge())
+            return false;
+
+        return isCallSiteSameAsCaller != other.isCallSiteSameAsCaller();
+    }
 }

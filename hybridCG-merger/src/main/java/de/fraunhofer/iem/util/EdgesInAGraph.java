@@ -2,12 +2,13 @@ package de.fraunhofer.iem.util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class EdgesInAGraph implements Serializable {
     private static final long serialVersionUID = 6529685028967757690L;
 
     private String name;
-    private final ArrayList<DirectedEdge> directedEdges = new ArrayList<>();
+    private final HashSet<DirectedEdge> directedEdges = new HashSet<>();
     private final SerializableDotGraph serializableDotGraph;
 
     public EdgesInAGraph(String name, SerializableDotGraph serializableDotGraph) {
@@ -23,7 +24,7 @@ public class EdgesInAGraph implements Serializable {
         this.name = name;
     }
 
-    public ArrayList<DirectedEdge> getDirectedEdges() {
+    public HashSet<DirectedEdge> getDirectedEdges() {
         return directedEdges;
     }
 
