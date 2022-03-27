@@ -117,12 +117,12 @@ public class DynamicCallStack {
                     true,
                     true));
 
-//            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
-//
-//            dotGraphEdge.setLabel(-1 + "[" + associatedLibraryCall + "]");
-//
-//            dotGraphEdge.setAttribute("color", "red");
-//            dotGraphEdge.setStyle("dashed");
+            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
+
+            dotGraphEdge.setLabel(-1 + "[" + associatedLibraryCall + "]");
+
+            dotGraphEdge.setAttribute("color", "red");
+            dotGraphEdge.setStyle("dashed");
         } else {
             String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
             String associatedLibraryCall = null;
