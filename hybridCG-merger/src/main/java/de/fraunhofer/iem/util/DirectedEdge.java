@@ -124,6 +124,6 @@ public class DirectedEdge implements Serializable {
         if (isFakeEdge != other.isFakeEdge())
             return false;
 
-        return isCallSiteSameAsCaller != other.isCallSiteSameAsCaller();
+        return isCallSiteSameAsCaller == other.isCallSiteSameAsCaller();
     }
 }
