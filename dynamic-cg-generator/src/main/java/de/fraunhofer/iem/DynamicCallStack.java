@@ -109,20 +109,24 @@ public class DynamicCallStack {
             String associatedLibraryCall = "sameAsCalleeMethod_Fake";
 
 
-            edgesInAGraph.addDirectedEdge(new DirectedEdge(
+            DirectedEdge directedEdge = new DirectedEdge(
                     sourceNode,
                     methodSignature,
                     associatedLibraryCall,
                     -1,
                     true,
-                    true));
+                    true);
 
-            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
+            if (!edgesInAGraph.getDirectedEdges().contains(directedEdge)) {
+                edgesInAGraph.addDirectedEdge(directedEdge);
 
-            dotGraphEdge.setLabel(-1 + "[" + associatedLibraryCall + "]");
+                DotGraphEdge dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
 
-            dotGraphEdge.setAttribute("color", "red");
-            dotGraphEdge.setStyle("dashed");
+                dotGraphEdge.setLabel(-1 + "[" + associatedLibraryCall + "]");
+
+                dotGraphEdge.setAttribute("color", "red");
+                dotGraphEdge.setStyle("dashed");
+            }
         } else {
             String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
             String associatedLibraryCall = null;
@@ -132,35 +136,40 @@ public class DynamicCallStack {
             String nextMethodSignature = null;
             int lineNumber = -1;
 
-//            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-//
-//            for (int index = 0; index < stackTraceElements.length; ++index) {
-//                StackTraceElement stackTraceElement = stackTraceElements[index];
-//                String currentMethodSignature = stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName();
-//
-//                String temp = methodSignature.split(": ")[0].replace("<", "") +
-//                        "." + methodSignature.split(": ")[1].split(" ")[1].replace(">", "");
-//
-//                if (temp.startsWith(currentMethodSignature + "(")) {
-//                    nextMethodSignature = stackTraceElements[index - 1].getClassName() + "." + stackTraceElements[index - 1].getMethodName();
-//                    lineNumber = stackTraceElement.getLineNumber();
-//
-//                    if (methodSignature.startsWith(nextMethodSignature + "(")) {
-//                        isCallSiteSameAsCaller = true;
-//                    }
-//                }
-//            }
+            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
+            for (int index = 0; index < stackTraceElements.length; ++index) {
+                StackTraceElement stackTraceElement = stackTraceElements[index];
+                String currentMethodSignature = stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName();
+
+                String temp = sourceNode.split(": ")[0] +
+                        "." + sourceNode.split(": ")[1].split(" ")[1];
+
+                if (temp.startsWith(currentMethodSignature + "(")) {
+                    nextMethodSignature = stackTraceElements[index - 1].getClassName() + "." + stackTraceElements[index - 1].getMethodName();
+                    lineNumber = stackTraceElement.getLineNumber();
+
+                    String temp1 = methodSignature.split(": ")[0] +
+                            "." + methodSignature.split(": ")[1].split(" ")[1];
+
+                    if (temp1.startsWith(nextMethodSignature + "(")) {
+                        isCallSiteSameAsCaller = true;
+                    }
+
+                    break;
+                }
+            }
 
             if (isFakeEdge(methodSignature)) isFakeEdge = true;
             else if (isFakeEdge(sourceNode)) {
                 isFakeEdge = true;
             }
 
-            dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
-
             if (isAssociatedLibraryCallPresent) {
                 if (this.associatedLibraryCallStack.size() > 0) {
-                    String temp = this.associatedLibraryCallStack.get(this.associatedLibraryCallStack.size() - 1);
+                    String associated = this.associatedLibraryCallStack.get(this.associatedLibraryCallStack.size() - 1);
+                    String temp = associated.split(": ")[0] +
+                            "." + associated.split(": ")[1].split(" ")[1];
 
                     if (nextMethodSignature != null) {
                         if (!temp.startsWith(nextMethodSignature + "(")) {
@@ -182,15 +191,27 @@ public class DynamicCallStack {
                 associatedLibraryCall = "NA";
             }
 
-            edgesInAGraph.addDirectedEdge(new DirectedEdge(sourceNode, methodSignature, associatedLibraryCall, lineNumber, isFakeEdge, isCallSiteSameAsCaller));
+            DirectedEdge directedEdge = new DirectedEdge(
+                    sourceNode,
+                    methodSignature,
+                    associatedLibraryCall,
+                    lineNumber,
+                    isFakeEdge,
+                    isCallSiteSameAsCaller);
 
-            dotGraphEdge.setLabel(lineNumber + "[" + associatedLibraryCall + "]");
+            if (!edgesInAGraph.getDirectedEdges().contains(directedEdge)) {
+                edgesInAGraph.addDirectedEdge(directedEdge);
 
-            if (!isCallSiteSameAsCaller) dotGraphEdge.setAttribute("color", "red");
+                dotGraphEdge = dotGraph.drawEdge(sourceNode, methodSignature);
 
-            if (isFakeEdge) {
-                dotGraphEdge.setStyle("dashed");
-                dotGraphEdge.setAttribute("color", "red");
+                dotGraphEdge.setLabel(lineNumber + "[" + associatedLibraryCall + "]");
+
+                if (!isCallSiteSameAsCaller) dotGraphEdge.setAttribute("color", "red");
+
+                if (isFakeEdge) {
+                    dotGraphEdge.setStyle("dashed");
+                    dotGraphEdge.setAttribute("color", "red");
+                }
             }
 
             this.continuousCallStack.add(methodSignature);
