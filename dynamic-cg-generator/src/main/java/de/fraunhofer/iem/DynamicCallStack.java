@@ -4,12 +4,14 @@ package de.fraunhofer.iem;
 import de.fraunhofer.iem.util.*;
 import soot.util.dot.DotGraphEdge;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 
 /**
@@ -228,18 +230,6 @@ public class DynamicCallStack {
         return false;
     }
 
-    public void methodCall_backup(String methodSignature) {
-        if (callStack.size() == MAX_STORAGE) {
-            writeToFile();
-
-            callStack.clear();
-        }
-
-        callStack.add(currentIndentation.toString() + ">" + methodSignature);
-
-        currentIndentation.append("  ");
-    }
-
     /**
      * Performs the operations related to method return call i.e. removing the method to stack,
      * plotting the dot graph if the stack contains only one element.
@@ -267,27 +257,6 @@ public class DynamicCallStack {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
         }
-    }
-
-    private String readFromInputStream(InputStream inputStream) throws IOException {
-        StringBuilder resultStringBuilder = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                resultStringBuilder.append(line).append("\n");
-            }
-        }
-        return resultStringBuilder.toString();
-    }
-
-    public void methodReturn_backup(String methodSignature) {
-        currentIndentation.setLength(currentIndentation.length() - 2);
-
-        callStack.add(currentIndentation.toString() + "<" + methodSignature);
-
-        writeToFile();
-
-        callStack.clear();
     }
 
     public void writeToFile() {
