@@ -20,8 +20,9 @@ import org.junit.Test;
 public class TestTheLibrary {
     @Test
     public void test() throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException {
-        //TODO: Remove this after testing
+        //TODO: Alter this based on your testing
         String appClassPath = "D:\\cgbench\\CGBench\\bean\\target\\classes";
+//        String appClassPath = "D:\\Work\\HybridCG\\spring-petclinic\\target\\classes";
 
         initializeSoot(appClassPath);
 

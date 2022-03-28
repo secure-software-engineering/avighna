@@ -1,6 +1,7 @@
 package de.fraunhofer.iem;
 
 
+import de.fraunhofer.iem.exception.DtsSerializeUtilException;
 import de.fraunhofer.iem.util.*;
 import soot.util.dot.DotGraphEdge;
 
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 
 /**
@@ -245,7 +247,11 @@ public class DynamicCallStack {
 
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
 
-            SerializableUtility.serialize(edgesInAGraph, outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid);
+            try {
+                SerializableUtility.serialize(edgesInAGraph, outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid);
+            } catch (DtsSerializeUtilException e) {
+                LoggerUtil.getLOGGER().log(Level.WARNING, "Could not serialize the dynamic traces. \n" + e.getMessage());
+            }
 
             LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
 

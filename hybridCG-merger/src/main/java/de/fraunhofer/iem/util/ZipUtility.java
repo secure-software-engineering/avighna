@@ -1,5 +1,7 @@
 package de.fraunhofer.iem.util;
 
+import de.fraunhofer.iem.exception.DtsZipUtilException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,14 +17,20 @@ import java.util.zip.ZipInputStream;
  * Taken from https://www.journaldev.com/960/java-unzip-file-example#:~:text=To%20unzip%20a%20zip%20file,present%20in%20the%20zip%20file.
  */
 public class ZipUtility {
-    public static List<String> unzipDTSFile(String dtsFilePath) {
+    /**
+     * Unzip the DTS file
+     *
+     * @param dtsFilePath Path of DTS file
+     * @return List of path of .ser file
+     * @throws DtsZipUtilException Zip utility failed to unzip DTS fie
+     */
+    public static List<String> unzipDTSFile(String dtsFilePath) throws DtsZipUtilException {
         File dir = null;
         try {
             dir = new File(Files.createTempDirectory("allDotFiles").toFile().getAbsolutePath());
         } catch (IOException e) {
-            //TODO: Handle custom exception
-            e.printStackTrace();
-            return new ArrayList<>();
+            throw new DtsZipUtilException("Failed to create temporary directory for unzipping DTS file." +
+                    "\nMessage = " + e.getMessage());
         }
 
         if (!dir.exists())
@@ -56,8 +64,8 @@ public class ZipUtility {
             zipInputStream.close();
             fileInputStream.close();
         } catch (IOException e) {
-            //TODO: Throw custom exception to inform the user
-            e.printStackTrace();
+            throw new DtsZipUtilException("Failed to unzip DTS file." +
+                    "\nMessage = " + e.getMessage());
         }
 
         ArrayList<String> dotFiles = new ArrayList<>();
@@ -70,7 +78,8 @@ public class ZipUtility {
                         dotFiles.add(it.toAbsolutePath().toString());
                     });
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new DtsZipUtilException("Failed to retrieve unzipped DTS files location." +
+                    "\nMessage = " + e.getMessage());
         }
 
         return dotFiles;
