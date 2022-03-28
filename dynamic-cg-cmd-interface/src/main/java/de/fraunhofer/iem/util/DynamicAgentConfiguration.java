@@ -11,7 +11,6 @@ public class DynamicAgentConfiguration {
     private String rootPackageNameOfApplication;
     private String outputRootDirectory;
     private boolean saveCallGraphAsDotFile;
-    private boolean saveCallGraphAsImage;
     private List<String> excludeClasses;
     private List<String> fakeEdgesString;
 
@@ -37,14 +36,6 @@ public class DynamicAgentConfiguration {
 
     public void setSaveCallGraphAsDotFile(boolean saveCallGraphAsDotFile) {
         this.saveCallGraphAsDotFile = saveCallGraphAsDotFile;
-    }
-
-    public boolean isSaveCallGraphAsImage() {
-        return saveCallGraphAsImage;
-    }
-
-    public void setSaveCallGraphAsImage(boolean saveCallGraphAsImage) {
-        this.saveCallGraphAsImage = saveCallGraphAsImage;
     }
 
     public List<String> getExcludeClasses() {

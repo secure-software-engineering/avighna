@@ -130,6 +130,7 @@ public class AgentTransformer implements ClassFileTransformer {
                 returnType = ((CtMethod) method).getReturnType().getName();
             } catch (NotFoundException e) {
 //                e.printStackTrace();
+                //TODO: Record these so that user will know these methods return types are not found
             }
 
             methodName = method.getName();
@@ -137,17 +138,13 @@ public class AgentTransformer implements ClassFileTransformer {
 
         parametersType = method.getLongName().split("\\(")[1].replace(")", "");
 
-        StringBuilder signature = new StringBuilder();
-
-        return signature
-                .append(className)
-                .append(": ")
-                .append(returnType)
-                .append(" ")
-                .append(methodName)
-                .append("(")
-                .append(parametersType)
-                .append(")")
-                .toString();
+        return className +
+                ": " +
+                returnType +
+                " " +
+                methodName +
+                "(" +
+                parametersType +
+                ")";
     }
 }

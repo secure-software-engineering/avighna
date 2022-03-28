@@ -34,7 +34,6 @@ public class DynamicCallStack {
     public static final Set<String> fakeEdges = new HashSet<>();
     public static String outputRootDirectory;
     public static boolean saveCallGraphAsDotFile;
-    public static boolean saveCallGraphAsImage;
 
     /**
      * Initializes the stack
@@ -75,6 +74,7 @@ public class DynamicCallStack {
             this.associatedLibraryCallStack.add(methodSignature);
             isAssociatedLibraryCallPresent = true;
 
+            //TODO: Test the below uncommented code (and check is it required)
 //            StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 //            String sourceNode = this.continuousCallStack.get(this.continuousCallStack.size() - 1);
 //
@@ -259,20 +259,10 @@ public class DynamicCallStack {
 
             LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
 
-            if (saveCallGraphAsDotFile || saveCallGraphAsImage) {
+            if (saveCallGraphAsDotFile) {
                 dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
                 LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
             }
-//
-//            if (saveCallGraphAsImage) {
-//                saveDotAsSVG(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot", outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg");
-//                LoggerUtil.getLOGGER().info("SVG file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".svg").getAbsolutePath().toString());
-//            }
-//
-//            if (saveCallGraphAsImage && !saveCallGraphAsDotFile) {
-//                new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot")
-//                        .delete();
-//            }
         } else if (this.continuousCallStack.size() > 0) {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
@@ -317,42 +307,4 @@ public class DynamicCallStack {
         writeToFile();
         callStack.clear();
     }
-
-//    public static String dotToSvgJarPath = null;
-//
-//    /**
-//     * This method converts the given dot file into image file
-//     *
-//     * @param dotFileName         Dot file name
-//     * @param outputImageFileName Image file name
-//     */
-//    private void saveDotAsSVG(String dotFileName, String outputImageFileName) {
-//        if (dotToSvgJarPath == null) {
-//            LoggerUtil.getLOGGER().log(Level.WARNING, "Can not generates SVG file");
-//            return;
-//        }
-//
-//        try {
-//            String command = "java -jar " + dotToSvgJarPath + " " + dotFileName + " " + outputImageFileName;
-//
-//            Process proc = Runtime.getRuntime().exec(command);
-//
-//            InputStream err = proc.getErrorStream();
-//
-//            BufferedReader inn = new BufferedReader(new InputStreamReader(err));
-//            String message = null;
-//            String line = null;
-//            while ((line = inn.readLine()) != null) {
-//                if (message == null) message = line + "\n";
-//
-//                message += line + "\n";
-//            }
-//
-//            if (line != null) {
-//                LoggerUtil.getLOGGER().log(Level.WARNING, "Some error occurred while generating SVG file = Message from external Jar is = " + message);
-//            }
-//        } catch (IOException e) {
-//            LoggerUtil.getLOGGER().log(Level.WARNING, "Some error occurred while generating SVG file = " + e.getMessage());
-//        }
-//    }
 }
