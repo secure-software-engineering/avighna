@@ -291,7 +291,13 @@ public class HybridCallGraph {
 
 
             DotGraphEdge dotGraphEdge = dotGraph.drawEdge(node_src, node_tgt);
-            dotGraphEdge.setLabel(edge.srcStmt().toString());
+
+            if (edge.srcStmt() == null) {
+                dotGraphEdge.setLabel("null");
+            } else {
+                dotGraphEdge.setLabel(edge.srcUnit().toString());
+            }
+
 
             ++numberOfEdgesInStaticCallGraph;
         }
