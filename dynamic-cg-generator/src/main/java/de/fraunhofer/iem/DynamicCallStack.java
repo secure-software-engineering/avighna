@@ -109,8 +109,8 @@ public class DynamicCallStack {
             this.continuousCallStack.add(methodSignature);
 
             // add a fake edge to represent the first call is from the spring boot framework
-            String sourceNode = "fakeMethod";
-            String associatedLibraryCall = "sameAsCalleeMethod_Fake";
+            String sourceNode = "dummyMethod";
+            String associatedLibraryCall = "sameAsCalleeMethod_Dummy";
 
 
             DirectedEdge directedEdge = new DirectedEdge(
