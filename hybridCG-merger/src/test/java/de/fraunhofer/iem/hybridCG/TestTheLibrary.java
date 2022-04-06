@@ -52,7 +52,7 @@ public class TestTheLibrary {
 
         String dynamicCP = new HybridCallGraph().getDynamicClassesPath(appClassPath, dtsFileName);
         Options.v().set_soot_classpath(appClassPath + File.pathSeparator + dynamicCP);
-        
+
         Options.v().set_prepend_classpath(true);
         Options.v().set_whole_program(true);
         Options.v().set_allow_phantom_refs(true);
