@@ -17,6 +17,8 @@ import soot.util.dot.DotGraphEdge;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -41,6 +43,10 @@ public class HybridCallGraph {
     private String pathToHybridCGDOTGraph;
     private String pathToStaticCGIMGGraph;
     private String pathToHybridCGIMGGraph;
+
+    public String getDynamicClassesPath(String classPath, String dtsFileName) throws DtsZipUtilException {
+        return ZipUtility.unzipDTSFile(dtsFileName) + File.separator + "dynamicCP";
+    }
 
     /**
      * This method merges the given list of dynamically generated edgesInAGraphs into the statically generated
@@ -248,7 +254,21 @@ public class HybridCallGraph {
     private List<EdgesInAGraph> getEdgesInAGraphFromDTSFile(String dtsFilePath) throws DtsSerializeUtilException, DtsZipUtilException {
         List<EdgesInAGraph> edgesInAGraphs = new ArrayList<>();
 
-        for (String filename : ZipUtility.unzipDTSFile(dtsFilePath)) {
+        ArrayList<String> dotFiles = new ArrayList<>();
+
+        try {
+            Files.walk(Paths.get(ZipUtility.unzipDTSFile(dtsFilePath)))
+                    .filter(Files::isRegularFile)
+                    .filter(it -> it.toAbsolutePath().toString().endsWith(".ser"))
+                    .forEach(it -> {
+                        dotFiles.add(it.toAbsolutePath().toString());
+                    });
+        } catch (IOException e) {
+            throw new DtsZipUtilException("Failed to retrieve unzipped DTS files location." +
+                    "\nMessage = " + e.getMessage());
+        }
+
+        for (String filename : dotFiles) {
             EdgesInAGraph edgesInAGraph = SerializableUtility.deSerialize(filename);
 
             edgesInAGraphs.add(edgesInAGraph);

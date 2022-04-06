@@ -7,6 +7,10 @@ import de.fraunhofer.iem.exception.DtsZipUtilException;
 import soot.*;
 import soot.options.Options;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,14 +23,16 @@ import org.junit.Test;
  */
 public class TestTheLibrary {
     @Test
-    public void test() throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException {
+    public void test() throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException, FileNotFoundException {
         //TODO: Alter this based on your testing
-        String appClassPath = "D:\\cgbench\\CGBench\\bean\\target\\classes";
-//        String appClassPath = "D:\\Work\\HybridCG\\spring-petclinic\\target\\classes";
-
-        initializeSoot(appClassPath);
+//        String appClassPath = "D:\\cgbench\\CGBench\\bean\\target\\classes";
+        String appClassPath = "D:\\Work\\HybridCG\\spring-petclinic\\target\\classes";
+//        String appClassPath = "D:\\Work\\HybridCG\\temp\\Test\\target\\classes";
+//        String appClassPath = "D:\\Work\\HybridCG\\temp\\fredbet\\target\\classes";
 
         String dtsFileName = "D:\\cgbench\\CGBench\\bean\\output\\dynamic_cg.dst";
+
+        initializeSoot(appClassPath, dtsFileName);
 
         new HybridCallGraph().merge(dtsFileName, Scene.v().getCallGraph(), "callgraph", "callgraph", ImageType.SVG);
     }
@@ -34,7 +40,7 @@ public class TestTheLibrary {
     /**
      * Initializes the soot
      */
-    private static void initializeSoot(String appClassPath) {
+    private static void initializeSoot(String appClassPath, String dtsFileName) throws DtsZipUtilException, FileNotFoundException {
         //TODO: Remove this after testing
         G.reset();
         Options.v().set_keep_line_number(true);
@@ -43,7 +49,10 @@ public class TestTheLibrary {
 
         Options.v().setPhaseOption("cg", "all-reachable:true");
         Options.v().set_allow_phantom_refs(true);
-        Options.v().set_soot_classpath(appClassPath);
+
+        String dynamicCP = new HybridCallGraph().getDynamicClassesPath(appClassPath, dtsFileName);
+        Options.v().set_soot_classpath(appClassPath + File.pathSeparator + dynamicCP);
+        
         Options.v().set_prepend_classpath(true);
         Options.v().set_whole_program(true);
         Options.v().set_allow_phantom_refs(true);
@@ -54,6 +63,8 @@ public class TestTheLibrary {
         Options.v().set_output_format(Options.output_format_none);
 
         List<String> appClasses = new ArrayList<>(FilesUtils.getClassesAsList(appClassPath));
+
+        appClasses.addAll(new ArrayList<>(FilesUtils.getClassesAsList(dynamicCP)));
 
         List<SootMethod> entries = new ArrayList<SootMethod>();
         for (String appClass : appClasses) {

@@ -21,10 +21,10 @@ public class ZipUtility {
      * Unzip the DTS file
      *
      * @param dtsFilePath Path of DTS file
-     * @return List of path of .ser file
+     * @return Path of unzipped folder
      * @throws DtsZipUtilException Zip utility failed to unzip DTS fie
      */
-    public static List<String> unzipDTSFile(String dtsFilePath) throws DtsZipUtilException {
+    public static String unzipDTSFile(String dtsFilePath) throws DtsZipUtilException {
         File dir = null;
         try {
             dir = new File(Files.createTempDirectory("allDotFiles").toFile().getAbsolutePath());
@@ -68,20 +68,6 @@ public class ZipUtility {
                     "\nMessage = " + e.getMessage());
         }
 
-        ArrayList<String> dotFiles = new ArrayList<>();
-
-        try {
-            Files.walk(Paths.get(dir.getAbsolutePath()))
-                    .filter(Files::isRegularFile)
-                    .filter(it -> it.toAbsolutePath().toString().endsWith(".ser"))
-                    .forEach(it -> {
-                        dotFiles.add(it.toAbsolutePath().toString());
-                    });
-        } catch (IOException e) {
-            throw new DtsZipUtilException("Failed to retrieve unzipped DTS files location." +
-                    "\nMessage = " + e.getMessage());
-        }
-
-        return dotFiles;
+        return dir.getAbsolutePath();
     }
 }
