@@ -107,7 +107,7 @@ public class DynamicCGAgent {
         DynamicCallStack.saveCallGraphAsDotFile = dynamicAgentConfiguration.isSaveCallGraphAsDotFile();
 
         LoggerUtil.getLOGGER().info("Instrumentation begins");
-        instrumentation.addTransformer(new AgentTransformer(applicationRootPackage, dynamicAgentConfiguration.getOutputRootDirectory(), dynamicAgentConfiguration.getExcludeClasses()));
+        instrumentation.addTransformer(new AgentTransformer(applicationRootPackage, dynamicAgentConfiguration.getOutputRootDirectory(), dynamicAgentConfiguration.getExcludeClasses(), dynamicAgentConfiguration.getFakeEdgesString()));
     }
 
     /**
