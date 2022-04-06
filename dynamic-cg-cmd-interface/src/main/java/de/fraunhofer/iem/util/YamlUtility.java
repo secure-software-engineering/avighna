@@ -95,6 +95,7 @@ public class YamlUtility {
         fakeEdgesString.add("$$FastClassBySpringCGLIB$$");
 
         dynamicAgentConfiguration.setFakeEdgesString(fakeEdgesString);
+        dynamicAgentConfiguration.setTrackEdges(!commandLine.hasOption(CommandLineUtility.DONT_TRACK_FAKE_EDGE_LONG));
 
         File settingsFile = new File(commandLine.getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT) + File.separator + "dynamic_agent.yml");
 

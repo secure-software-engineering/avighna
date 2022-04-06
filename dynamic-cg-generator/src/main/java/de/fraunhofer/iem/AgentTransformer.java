@@ -23,10 +23,17 @@ public class AgentTransformer implements ClassFileTransformer {
     private final String rootPackageNameOfApplication;
     private final String rootOutputDirectory;
     public final Set<String> fakeEdges = new HashSet<>();
+    public final boolean isTrackEdges;
 
-    public AgentTransformer(String rootPackageNameOfApplication, String rootOutputDirectory, List<String> excludeClasses, List<String> fakeEdges) {
+    public AgentTransformer(
+            String rootPackageNameOfApplication,
+            String rootOutputDirectory,
+            List<String> excludeClasses,
+            List<String> fakeEdges,
+            boolean isTrackEdges) {
         this.rootPackageNameOfApplication = rootPackageNameOfApplication;
         this.rootOutputDirectory = rootOutputDirectory;
+        this.isTrackEdges = isTrackEdges;
         this.exclude.addAll(excludeClasses);
         this.exclude.add("de/fraunhofer/iem/DynamicCGStack");
         this.exclude.add("de/fraunhofer/iem/DynamicCallStack");
@@ -59,6 +66,10 @@ public class AgentTransformer implements ClassFileTransformer {
             } catch (Exception | Error e) {
                 LoggerUtil.getLOGGER().log(Level.SEVERE, "ERROR creating class file for dynamic = " + e.getMessage());
                 e.printStackTrace();
+            }
+
+            if (!isTrackEdges) {
+                return classfileBuffer;
             }
         }
 

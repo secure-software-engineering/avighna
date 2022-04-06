@@ -13,6 +13,7 @@ public class DynamicAgentConfiguration {
     private boolean saveCallGraphAsDotFile;
     private List<String> excludeClasses;
     private List<String> fakeEdgesString;
+    private boolean isTrackEdges;
 
     public String getRootPackageNameOfApplication() {
         return rootPackageNameOfApplication;
@@ -52,5 +53,13 @@ public class DynamicAgentConfiguration {
 
     public void setFakeEdgesString(List<String> fakeEdgesString) {
         this.fakeEdgesString = fakeEdgesString;
+    }
+
+    public boolean isTrackEdges() {
+        return isTrackEdges;
+    }
+
+    public void setTrackEdges(boolean trackEdges) {
+        isTrackEdges = trackEdges;
     }
 }

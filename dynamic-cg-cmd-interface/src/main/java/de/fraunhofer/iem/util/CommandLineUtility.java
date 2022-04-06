@@ -25,6 +25,8 @@ public class CommandLineUtility {
     public static final String SAVE_DOT_FILE_LONG = "save-dot-files";
     public static final String SAVE_IMG_FILE_SHORT = "sif";
     public static final String SAVE_IMG_FILE_LONG = "save-img-files";
+    public static final String DONT_TRACK_FAKE_EDGE_SHORT = "dtf";
+    public static final String DONT_TRACK_FAKE_EDGE_LONG = "dont-track-fake-edge";
 
     private static final Options cmdOptions = new Options();
     private static CommandLine commandLine;
@@ -89,6 +91,13 @@ public class CommandLineUtility {
                 "Save the generated dynamic trace as image files"
         );
 
+        Option trackFakeEdge = new Option(
+                DONT_TRACK_FAKE_EDGE_SHORT,
+                DONT_TRACK_FAKE_EDGE_LONG,
+                false,
+                "Dont track fake edges while generating dynamic traces"
+        );
+
         cmdOptions.addOption(appJarFile);
         cmdOptions.addOption(jarFile);
         cmdOptions.addOption(reqFile);
@@ -96,6 +105,7 @@ public class CommandLineUtility {
         cmdOptions.addOption(rootAppPackage);
         cmdOptions.addOption(saveDotFiles);
         cmdOptions.addOption(saveImgFiles);
+        cmdOptions.addOption(trackFakeEdge);
     }
 
     public static void getCommandLineOptions(String[] args) {
