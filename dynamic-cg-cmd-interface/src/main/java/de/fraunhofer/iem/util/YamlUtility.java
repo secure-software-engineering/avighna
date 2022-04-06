@@ -71,6 +71,14 @@ public class YamlUtility {
 
         file.mkdirs();
 
+        File file1 = new File(commandLine.getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT) + File.separator + "dynamicCP");
+
+        if (file1.exists()) {
+            file1.delete();
+        }
+
+        file1.mkdirs();
+
         dynamicAgentConfiguration.setOutputRootDirectory(file.getAbsolutePath());
         dynamicAgentConfiguration.setSaveCallGraphAsDotFile(commandLine.hasOption(CommandLineUtility.SAVE_DOT_FILE_LONG));
 
