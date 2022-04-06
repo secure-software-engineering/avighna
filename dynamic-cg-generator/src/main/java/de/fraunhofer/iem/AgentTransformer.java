@@ -1,16 +1,17 @@
 package de.fraunhofer.iem;
 
+import de.fraunhofer.iem.util.LoggerUtil;
 import javassist.*;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
 
 /**
  * This transformer instrument the code to generate Dynamic CG
@@ -21,8 +22,9 @@ public class AgentTransformer implements ClassFileTransformer {
     private final List<String> exclude = new ArrayList<>();
     private final String rootPackageNameOfApplication;
     private final String rootOutputDirectory;
+    public final Set<String> fakeEdges = new HashSet<>();
 
-    public AgentTransformer(String rootPackageNameOfApplication, String rootOutputDirectory, List<String> excludeClasses) {
+    public AgentTransformer(String rootPackageNameOfApplication, String rootOutputDirectory, List<String> excludeClasses, List<String> fakeEdges) {
         this.rootPackageNameOfApplication = rootPackageNameOfApplication;
         this.rootOutputDirectory = rootOutputDirectory;
         this.exclude.addAll(excludeClasses);
@@ -41,12 +43,23 @@ public class AgentTransformer implements ClassFileTransformer {
         this.exclude.add("de/fraunhofer/iem/util/LoggerUtil");
         //TODO: the below will cause termination of the tool, test it and fix it
 //        exclude.add("de/fraunhofer/iem/springbench/bean/configurations/MyConfiguration$$EnhancerBySpringCGLIB");
+
+        this.fakeEdges.addAll(fakeEdges);
     }
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         if (loader == null || className == null || className.equals("null")) {
             return classfileBuffer;
+        }
+
+        if (isFakeEdge(className)) {
+            try {
+                writeClassFile(className, classfileBuffer);
+            } catch (Exception | Error e) {
+                LoggerUtil.getLOGGER().log(Level.SEVERE, "ERROR creating class file for dynamic = " + e.getMessage());
+                e.printStackTrace();
+            }
         }
 
         for (String excludeString : exclude) {
@@ -60,6 +73,31 @@ public class AgentTransformer implements ClassFileTransformer {
         } else {
             return enhanceClass(className, classfileBuffer, true);
         }
+    }
+
+    private void writeClassFile(String className, byte[] classFileBuffer) {
+        if (className.contains("/")) {
+            new File(rootOutputDirectory.replace("allDotFiles", "") + File.separator +
+                    "dynamicCP" + File.separator +
+                    className.substring(0, className.lastIndexOf("/"))).mkdirs();
+        }
+
+        File file = new File(rootOutputDirectory.replace("allDotFiles", "") + File.separator + "dynamicCP" + File.separator + className + ".class");
+
+        if (file.exists()) file.delete();
+
+        try {
+            file.createNewFile();
+
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+            fileOutputStream.write(classFileBuffer);
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            LoggerUtil.getLOGGER().log(Level.SEVERE, "ERROR generating class file for dynamic classes = " + e.getMessage());
+        }
+
     }
 
     private byte[] enhanceClass(String className, byte[] classfileBuffer, boolean isLibraryCall) {
@@ -113,6 +151,16 @@ public class AgentTransformer implements ClassFileTransformer {
         }
 
         return byteCode;
+    }
+
+    private boolean isFakeEdge(String methodSignature) {
+        for (String fakeEdge : fakeEdges) {
+            if (methodSignature.contains(fakeEdge)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private String generateSootMethodSignature(CtBehavior method, boolean isConstructor, String javassistClassName) {
