@@ -22,7 +22,7 @@ public class MainInterface {
         try {
             String cmd = "java" +
                     " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
-                    " -jar " +
+                    " -noverify -jar " +
                     commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
 
             Process proc = Runtime.getRuntime().exec(cmd);
