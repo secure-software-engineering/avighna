@@ -20,47 +20,51 @@ public class MainInterface {
 
     private static void runApplicationWithJavaAgent(CommandLine commandLine) {
         try {
-            String cmd = "java" +
+            String cmd = "cmd.exe /c cd . & start cmd.exe /c java" +
                     " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
-                    " -noverify -jar " +
+                    " -jar " +
                     commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
 
             Process proc = Runtime.getRuntime().exec(cmd);
 
-            System.out.println(cmd);
-
-            InputStream stdErr = proc.getErrorStream();
-            InputStreamReader isrErr = new InputStreamReader(stdErr);
-            BufferedReader brErr = new BufferedReader(isrErr);
-
-            String linee = null;
-            System.out.println("ERROR = ");
-
-            while (!isInterrupted) {
-                if (brErr.ready()) {
-                    System.out.println(brErr.readLine());
-                }
+            while (true) {
+                if (!proc.isAlive())
+                    break;
             }
-
-            InputStream stdIn = proc.getInputStream();
-            InputStreamReader isr = new InputStreamReader(stdIn);
-            BufferedReader br = new BufferedReader(isr);
-
-            String line = null;
-            System.out.println("OUTPUT = ");
-
-            while (!isInterrupted) {
-                if (br.ready()) {
-                    System.out.println(br.readLine());
-                }
-            }
-
-            proc.destroy();
-
-            if (proc.isAlive()) {
-                proc.destroyForcibly();
-            }
-
+//            System.out.println(cmd);
+//
+//            InputStream stdErr = proc.getErrorStream();
+//            InputStreamReader isrErr = new InputStreamReader(stdErr);
+//            BufferedReader brErr = new BufferedReader(isrErr);
+//
+//            String linee = null;
+//            System.out.println("ERROR = ");
+//
+//            while (!isInterrupted) {
+//                if (brErr.ready()) {
+//                    System.out.println(brErr.readLine());
+//                }
+//            }
+//
+//            InputStream stdIn = proc.getInputStream();
+//            InputStreamReader isr = new InputStreamReader(stdIn);
+//            BufferedReader br = new BufferedReader(isr);
+//
+//            String line = null;
+//            System.out.println("OUTPUT = ");
+//
+//            while (!isInterrupted) {
+//                if (br.ready()) {
+//                    System.out.println(br.readLine());
+//                }
+//            }
+//
+//            proc.destroy();
+//
+//            if (proc.isAlive()) {
+//                proc.destroyForcibly();
+//            }
+//
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,9 +96,15 @@ public class MainInterface {
         t1.start();
 
 
+//        while (true) {
+//            if (tempFile.exists())
+//                break;
+//        }
+
         while (true) {
-            if (tempFile.exists())
+            if (!t1.isAlive()) {
                 break;
+            }
         }
 
         try {

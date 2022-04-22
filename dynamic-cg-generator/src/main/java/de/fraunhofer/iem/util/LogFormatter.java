@@ -25,7 +25,7 @@ public class LogFormatter extends Formatter {
     public String format(LogRecord record) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(ANSI_BLACK);
+        builder.append(ANSI_WHITE);
         builder.append(generateDataAndTime(record.getMillis()));
         builder.append(ANSI_RESET);
 

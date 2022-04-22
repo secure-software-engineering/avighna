@@ -247,18 +247,7 @@ public class DynamicCallStack {
 
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
 
-            try {
-                SerializableUtility.serialize(edgesInAGraph, outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid);
-            } catch (DtsSerializeUtilException e) {
-                LoggerUtil.getLOGGER().log(Level.WARNING, "Could not serialize the dynamic traces. \n" + e.getMessage());
-            }
-
-            LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
-
-            if (saveCallGraphAsDotFile) {
-                dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
-                LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
-            }
+//            writeRequest();
         } else if (this.continuousCallStack.size() > 0) {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
             this.isAssociatedLibraryCallPresent = true;
@@ -279,7 +268,21 @@ public class DynamicCallStack {
     }
 
     public void writeRequest() {
-        writeToFile();
-        callStack.clear();
+        LoggerUtil.getLOGGER().log(Level.SEVERE, "FINALLY REACHED HERE");
+        try {
+            SerializableUtility.serialize(edgesInAGraph, outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid);
+        } catch (DtsSerializeUtilException e) {
+            LoggerUtil.getLOGGER().log(Level.WARNING, "Could not serialize the dynamic traces. \n" + e.getMessage());
+        }
+
+        LoggerUtil.getLOGGER().info("Serialized Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".ser").getAbsolutePath().toString());
+
+        if (saveCallGraphAsDotFile) {
+            dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
+            LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
+        }
+
+//        writeToFile();
+//        callStack.clear();
     }
 }

@@ -20,9 +20,7 @@ public class DynamicCallStackManager {
      *
      * @return Dynamic CG if present otherwise returns null
      */
-    private static DynamicCallStack getDynamicCallStack() {
-        long id = Thread.currentThread().getId();
-
+    private static DynamicCallStack getDynamicCallStack(long id) {
         for (DynamicCallStack dynamicCallStack : myDynamicCallStack) {
             if (dynamicCallStack.getPid() == id) {
                 return dynamicCallStack;
@@ -40,7 +38,7 @@ public class DynamicCallStackManager {
      */
     public static void methodCall(String methodSignature, boolean isLibraryCall) {
         try {
-            DynamicCallStack dynamicCallStack = getDynamicCallStack();
+            DynamicCallStack dynamicCallStack = getDynamicCallStack(Thread.currentThread().getId());
 
             if (dynamicCallStack == null) {
                 if (isLibraryCall) return;
@@ -48,6 +46,10 @@ public class DynamicCallStackManager {
                 dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
                 myDynamicCallStack.add(dynamicCallStack);
                 LoggerUtil.getLOGGER().info("Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId());
+
+                long id = Thread.currentThread().getId();
+                Thread thread = new Thread(() -> writeForcefully(id));
+                Runtime.getRuntime().addShutdownHook(thread);
             }
 
             if (isLibraryCall) {
@@ -69,7 +71,7 @@ public class DynamicCallStackManager {
      */
     public static void methodReturn(String methodSignature, boolean isLibraryCall) {
         try {
-            DynamicCallStack dynamicCallStack = getDynamicCallStack();
+            DynamicCallStack dynamicCallStack = getDynamicCallStack(Thread.currentThread().getId());
 
             if (dynamicCallStack == null) {
                 if (isLibraryCall) return;
@@ -77,6 +79,10 @@ public class DynamicCallStackManager {
                 dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
                 LoggerUtil.getLOGGER().log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
                         "However, it happened in methodReturn, Please check the logic.");
+
+                long id = Thread.currentThread().getId();
+                Thread thread = new Thread(() -> writeForcefully(id));
+                Runtime.getRuntime().addShutdownHook(thread);
             }
 
             if (isLibraryCall) {
@@ -93,11 +99,11 @@ public class DynamicCallStackManager {
     /**
      * API that allows user to forcefully write the Dynamic CG to the file
      */
-    public static void writeForcefully() {
-        DynamicCallStack dynamicCallStack = getDynamicCallStack();
+    public static void writeForcefully(long id) {
+        DynamicCallStack dynamicCallStack = getDynamicCallStack(id);
 
         if (dynamicCallStack == null) {
-            dynamicCallStack = new DynamicCallStack(Thread.currentThread().getId());
+            dynamicCallStack = new DynamicCallStack(id);
             myDynamicCallStack.add(dynamicCallStack);
             LoggerUtil.getLOGGER().log(Level.WARNING, "Created new Dynamic Call stack for the process id = " + Thread.currentThread().getId() +
                     "However, it happened in writeForcefully, Please check the logic.");

@@ -26,9 +26,9 @@ public class TestTheLibrary {
     public void test() throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException, FileNotFoundException {
         //TODO: Alter this based on your testing
 //        String appClassPath = "D:\\cgbench\\CGBench\\bean\\target\\classes";
-        String appClassPath = "D:\\Work\\HybridCG\\spring-petclinic\\target\\classes";
+//        String appClassPath = "D:\\Work\\HybridCG\\spring-petclinic\\target\\classes";
 //        String appClassPath = "D:\\Work\\HybridCG\\temp\\Test\\target\\classes";
-//        String appClassPath = "D:\\Work\\HybridCG\\temp\\fredbet\\target\\classes";
+        String appClassPath = "D:\\Work\\HybridCG\\temp\\fredbet\\target\\classes";
 
         String dtsFileName = "D:\\cgbench\\CGBench\\bean\\output\\dynamic_cg.dst";
 
