@@ -93,6 +93,7 @@ public class YamlUtility {
         List<String> fakeEdgesString = new ArrayList<>();
         fakeEdgesString.add("$$EnhancerBySpringCGLIB$$");
         fakeEdgesString.add("$$FastClassBySpringCGLIB$$");
+        fakeEdgesString.add("$$KeyFactoryByCGLIB$$");
 
         dynamicAgentConfiguration.setFakeEdgesString(fakeEdgesString);
         dynamicAgentConfiguration.setTrackEdges(!commandLine.hasOption(CommandLineUtility.DONT_TRACK_FAKE_EDGE_LONG));
