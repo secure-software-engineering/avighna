@@ -20,16 +20,37 @@ public class MainInterface {
 
     private static void runApplicationWithJavaAgent(CommandLine commandLine) {
         try {
-            String cmd = "cmd.exe /c cd . & start cmd.exe /c java" +
+            String cmd = "cmd.exe /c cd . & start cmd.exe /c \"java" +
+                    " -Xbootclasspath/p:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) +
                     " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
-                    " -jar " +
-                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
+                    " -noverify -jar " +
+                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT) + " & set /p dummy=Spring application terminated. Press enter.\"";
 
+            System.out.println(cmd);
             Process proc = Runtime.getRuntime().exec(cmd);
 
-            while (true) {
-                if (!proc.isAlive())
-                    break;
+//            try {
+//                Thread.sleep(60000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//
+//            while (true) {
+//                if (!proc.isAlive())
+//                    break;
+//            }
+
+            String closeApp = "n";
+
+            while (!closeApp.toLowerCase().equals("y") && !closeApp.toLowerCase().equals("yes")) {
+                System.out.print("Completed? Should we terminate the application and generate DTS file?   ");
+                Scanner scanner = new Scanner(System.in);
+
+                closeApp = scanner.nextLine();
+
+                if (closeApp == null || closeApp.equals("")) {
+                    closeApp = "n";
+                }
             }
 //            System.out.println(cmd);
 //
