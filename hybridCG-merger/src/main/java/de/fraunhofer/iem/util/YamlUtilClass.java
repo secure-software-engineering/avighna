@@ -22,7 +22,7 @@ public class YamlUtilClass {
      * @param hybridCGStats HybridCGStats
      * @return Path of the generated HybridCGStats file
      */
-    public static String generateStatsFile(HybridCGStats hybridCGStats) {
+    public static String generateStatsFile(HybridCGStats hybridCGStats, String rootOutputDir) {
         DumperOptions options = new DumperOptions();
         options.setIndent(2);
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -34,7 +34,7 @@ public class YamlUtilClass {
         representer.addClassTag(HybridCGStats.class, Tag.MAP);
         Yaml yaml = new Yaml(representer, options);
 
-        File settingsFile = new File("hybrid_stats.yml");
+        File settingsFile = new File(rootOutputDir + "hybrid_stats.yml");
 
         try {
             yaml.dump(hybridCGStats, new FileWriter(settingsFile));

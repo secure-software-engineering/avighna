@@ -58,7 +58,17 @@ public class HybridCallGraph {
      * @throws DtsSerializeUtilException Serializable utility failed to serialize/deserialize DTS file
      * @throws DtsZipUtilException       Zip utility failed to unzip DTS fie
      */
-    private void merge(String dtsFileName, CallGraph staticCallGraph, boolean isDotGraphGenerate) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException {
+    private void merge(String dtsFileName, CallGraph staticCallGraph, String rootOutputDir, boolean isDotGraphGenerate) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException {
+        hybridCGStats = new HybridCGStats();
+        hybridCGStats.setPathToStaticCGIMGGraph("Not Available");
+        hybridCGStats.setPathToHybridCGIMGGraph("Not Available");
+        hybridCGStats.setPathToStaticCGDOTGraph("Not Available");
+        hybridCGStats.setPathToHybridCGDOTGraph("Not Available");
+
+        dotGraph = new DotGraph("final:callgraph");
+        // Generate the initial dot-graph from the static call-graph
+        generateInitialDotGraph();
+
         List<EdgesInAGraph> dynamicEdgesInAGraphs = getEdgesInAGraphFromDTSFile(dtsFileName);
 
         for (EdgesInAGraph edgesInAGraph : dynamicEdgesInAGraphs) {
@@ -67,8 +77,16 @@ public class HybridCallGraph {
 
                 // Leave the fake edges
                 if (!directedEdge.isFakeEdge()) {
-                    SootMethod caller = getMethod(directedEdge.getSource());
-                    SootMethod destination = getMethod(directedEdge.getDestination());
+                    SootMethod caller;
+                    SootMethod destination;
+
+                    try {
+                        caller = getMethod(directedEdge.getSource());
+                        destination = getMethod(directedEdge.getDestination());
+                    } catch (Exception | Error e) {
+                        continue;
+                    }
+
                     List<Stmt> statements = getAssociatedCallSiteUnit(caller, directedEdge.getAssociatedCallSite(), directedEdge.getAssociatedCallSiteLineNumber());
 
                     for (Stmt associatedCallSiteUnit : statements) {
@@ -89,23 +107,26 @@ public class HybridCallGraph {
                             throw new UnexpectedError("Something went wrong while matching an edge = " + e.getMessage());
                         }
 
-                        if (isDotGraphGenerate) {
-                            if (!isEdgeFound) {
+                        if (!isEdgeFound) {
+                            if (isDotGraphGenerate) {
                                 Edge edge = new Edge(caller, associatedCallSiteUnit, destination);
 
                                 staticCallGraph.addEdge(edge);
                                 DotGraphEdge dotGraphEdge = dotGraph.drawEdge(caller.getSignature(), destination.getSignature());
                                 dotGraphEdge.setLabel(associatedCallSiteUnit.toString());
                                 dotGraphEdge.setAttribute("color", "purple");
-                                ++numberOfDynamicEdgesAdded;
+                            }
 
-                                if (associatedCallSiteUnit.getInvokeExpr().getMethod().getSignature().equals(destination.getSignature())) {
-                                    ++numberOfEdgesWithSameCallSiteMethod;
-                                } else {
-                                    ++numberOfEdgesWithDifferentCallSiteMethod;
-                                }
+                            ++numberOfDynamicEdgesAdded;
+
+                            if (associatedCallSiteUnit.getInvokeExpr().getMethod().getSignature().equals(destination.getSignature())) {
+                                ++numberOfEdgesWithSameCallSiteMethod;
+                            } else {
+                                ++numberOfEdgesWithDifferentCallSiteMethod;
                             }
                         }
+
+
                     }
                 } else {
                     //TODO: If needed then add the fake edge here
@@ -113,6 +134,16 @@ public class HybridCallGraph {
                 }
             }
         }
+
+        hybridCGStats.setNumberOfEdgesInStaticCallGraph(numberOfEdgesInStaticCallGraph);
+        hybridCGStats.setNumberOfDynamicEdgesAdded(numberOfDynamicEdgesAdded);
+        hybridCGStats.setNumberOfEdgesWithSameCallSiteMethod(numberOfEdgesWithSameCallSiteMethod);
+        hybridCGStats.setNumberOfEdgesWithDifferentCallSiteMethod(numberOfEdgesWithDifferentCallSiteMethod);
+
+        int numberOfEdgesInHybridCallGraph = numberOfEdgesInStaticCallGraph + numberOfDynamicEdgesAdded;
+        hybridCGStats.setNumberOfEdgesInHybridCallGraph(numberOfEdgesInHybridCallGraph);
+
+        hybridCGStats.setNumberOfFakeEdges(numberOfFakeEdges);
     }
 
     /**
@@ -127,8 +158,10 @@ public class HybridCallGraph {
      * @throws DtsSerializeUtilException Serializable utility failed to serialize/deserialize DTS file
      * @throws DtsZipUtilException       Zip utility failed to unzip DTS fie
      */
-    public void merge(String dtsFileName, CallGraph staticCallGraph) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException {
-        merge(dtsFileName, staticCallGraph, false);
+    public void merge(String dtsFileName, CallGraph staticCallGraph, String rootOutputDir) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException {
+        merge(dtsFileName, staticCallGraph, rootOutputDir, false);
+
+        YamlUtilClass.generateStatsFile(hybridCGStats, rootOutputDir);
     }
 
     /**
@@ -147,8 +180,8 @@ public class HybridCallGraph {
      * @throws DtsZipUtilException       Zip utility failed to unzip DTS fie
      * @throws DotToImgException         Failed to convert DOT to image file
      */
-    public String merge(String dtsFileName, CallGraph staticCallGraph, String outputDotFileName, String outputImageName, ImageType imageType) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException {
-        String statFile = merge(dtsFileName, staticCallGraph, outputDotFileName);
+    public String merge(String dtsFileName, CallGraph staticCallGraph, String rootOutputDir, String outputDotFileName, String outputImageName, ImageType imageType) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException {
+        String statFile = merge(dtsFileName, staticCallGraph, rootOutputDir, outputDotFileName);
 
         new File(statFile).delete();
 
@@ -156,30 +189,30 @@ public class HybridCallGraph {
             case SVG:
                 saveDotAsImageFile(
                         hybridCGStats.getPathToStaticCGDOTGraph(),
-                        outputImageName + "_static_cg.svg", Format.SVG);
-                hybridCGStats.setPathToStaticCGIMGGraph(new File(outputImageName + "_static_cg.svg").getAbsolutePath());
+                        rootOutputDir + outputImageName + "_static_cg.svg", Format.SVG);
+                hybridCGStats.setPathToStaticCGIMGGraph(new File(rootOutputDir + outputImageName + "_static_cg.svg").getAbsolutePath());
 
                 saveDotAsImageFile(
                         hybridCGStats.getPathToHybridCGDOTGraph(),
-                        outputImageName + "_hybrid_cg.svg", Format.SVG);
-                hybridCGStats.setPathToHybridCGIMGGraph(new File(outputImageName + "_hybrid_cg.svg").getAbsolutePath());
+                        rootOutputDir + outputImageName + "_hybrid_cg.svg", Format.SVG);
+                hybridCGStats.setPathToHybridCGIMGGraph(new File(rootOutputDir + outputImageName + "_hybrid_cg.svg").getAbsolutePath());
 
                 break;
             case PNG:
                 saveDotAsImageFile(
                         hybridCGStats.getPathToStaticCGDOTGraph(),
-                        outputImageName + "_static_cg.png", Format.PNG);
-                hybridCGStats.setPathToStaticCGIMGGraph(new File(outputImageName + "_static_cg.png").getAbsolutePath());
+                        rootOutputDir + outputImageName + "_static_cg.png", Format.PNG);
+                hybridCGStats.setPathToStaticCGIMGGraph(new File(rootOutputDir + outputImageName + "_static_cg.png").getAbsolutePath());
 
                 saveDotAsImageFile(
                         hybridCGStats.getPathToHybridCGDOTGraph(),
-                        outputImageName + "_hybrid_cg.png", Format.PNG);
-                hybridCGStats.setPathToHybridCGIMGGraph(new File(outputImageName + "_hybrid_cg.png").getAbsolutePath());
+                        rootOutputDir + outputImageName + "_hybrid_cg.png", Format.PNG);
+                hybridCGStats.setPathToHybridCGIMGGraph(new File(rootOutputDir + outputImageName + "_hybrid_cg.png").getAbsolutePath());
 
                 break;
         }
 
-        return YamlUtilClass.generateStatsFile(hybridCGStats);
+        return YamlUtilClass.generateStatsFile(hybridCGStats, rootOutputDir);
     }
 
     /**
@@ -196,8 +229,8 @@ public class HybridCallGraph {
      * @throws DtsZipUtilException       Zip utility failed to unzip DTS fie
      * @throws DotToImgException         Failed to convert DOT to image file
      */
-    public String merge(String dtsFileName, CallGraph staticCallGraph, String outputDotFileName, String outputImageName) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException {
-        return merge(dtsFileName, staticCallGraph, outputDotFileName, outputImageName, ImageType.SVG);
+    public String merge(String dtsFileName, CallGraph staticCallGraph, String rootOutputDir, String outputDotFileName, String outputImageName) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException {
+        return merge(dtsFileName, staticCallGraph, rootOutputDir, outputDotFileName, outputImageName, ImageType.SVG);
     }
 
     /**
@@ -212,35 +245,17 @@ public class HybridCallGraph {
      * @throws DtsSerializeUtilException Serializable utility failed to serialize/deserialize DTS file
      * @throws DtsZipUtilException       Zip utility failed to unzip DTS fie
      */
-    public String merge(String dtsFileName, CallGraph staticCallGraph, String outputDotFileName) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException {
-        dotGraph = new DotGraph("final:callgraph");
-        // Generate the initial dot-graph from the static call-graph
-        generateInitialDotGraph();
-
-        hybridCGStats = new HybridCGStats();
+    public String merge(String dtsFileName, CallGraph staticCallGraph, String rootOutputDir, String outputDotFileName) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException {
+        merge(dtsFileName, staticCallGraph, rootOutputDir, true);
 
         dotGraph.plot(outputDotFileName + "_static_cg.dot");
-        hybridCGStats.setPathToStaticCGDOTGraph(new File(outputDotFileName + "_static_cg.dot").getAbsolutePath());
 
-        merge(dtsFileName, staticCallGraph, true);
+        hybridCGStats.setPathToStaticCGDOTGraph(new File(rootOutputDir + outputDotFileName + "_static_cg.dot").getAbsolutePath());
 
-        dotGraph.plot(outputDotFileName + "_hybrid_cg.dot");
-        hybridCGStats.setPathToHybridCGDOTGraph(new File(outputDotFileName + "_hybrid_cg.dot").getAbsolutePath());
+        dotGraph.plot(rootOutputDir + outputDotFileName + "_hybrid_cg.dot");
+        hybridCGStats.setPathToHybridCGDOTGraph(new File(rootOutputDir + outputDotFileName + "_hybrid_cg.dot").getAbsolutePath());
 
-        hybridCGStats.setNumberOfEdgesInStaticCallGraph(numberOfEdgesInStaticCallGraph);
-        hybridCGStats.setNumberOfDynamicEdgesAdded(numberOfDynamicEdgesAdded);
-        hybridCGStats.setNumberOfEdgesWithSameCallSiteMethod(numberOfEdgesWithSameCallSiteMethod);
-        hybridCGStats.setNumberOfEdgesWithDifferentCallSiteMethod(numberOfEdgesWithDifferentCallSiteMethod);
-
-        int numberOfEdgesInHybridCallGraph = numberOfEdgesInStaticCallGraph + numberOfDynamicEdgesAdded;
-        hybridCGStats.setNumberOfEdgesInHybridCallGraph(numberOfEdgesInHybridCallGraph);
-
-        hybridCGStats.setPathToStaticCGIMGGraph("Not Available");
-        hybridCGStats.setPathToStaticCGIMGGraph("Not Available");
-
-        hybridCGStats.setNumberOfFakeEdges(numberOfFakeEdges);
-
-        return YamlUtilClass.generateStatsFile(hybridCGStats);
+        return YamlUtilClass.generateStatsFile(hybridCGStats, rootOutputDir);
     }
 
     /**

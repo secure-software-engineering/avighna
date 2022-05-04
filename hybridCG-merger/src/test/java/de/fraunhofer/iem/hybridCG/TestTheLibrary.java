@@ -28,13 +28,25 @@ public class TestTheLibrary {
 //        String appClassPath = "D:\\cgbench\\CGBench\\bean\\target\\classes";
 //        String appClassPath = "D:\\Work\\HybridCG\\spring-petclinic\\target\\classes";
 //        String appClassPath = "D:\\Work\\HybridCG\\temp\\Test\\target\\classes";
-        String appClassPath = "D:\\Work\\HybridCG\\temp\\fredbet\\target\\classes";
+//        String appClassPath = "D:\\Work\\HybridCG\\temp\\fredbet\\target\\classes";
+//        String appClassPath = "D:\\Work\\HybridCG\\temp\\initializr\\start.spring.io\\start-site\\target\\classes";
+//        String appClassPath = "C:\\Users\\Ranjith\\Downloads\\zipkin-server-2.23.16-exec\\BOOT-INF\\classes";
+//        String appClassPath = "C:\\Users\\Ranjith\\Downloads\\streamflow-0.13.0\\streamflow-0.13.0\\lib\\streamflow-app-jar-0.13.0";
 
-        String dtsFileName = "D:\\cgbench\\CGBench\\bean\\output\\dynamic_cg.dst";
+        String appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
+        String dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
+        String hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
 
         initializeSoot(appClassPath, dtsFileName);
 
-        new HybridCallGraph().merge(dtsFileName, Scene.v().getCallGraph(), "callgraph", "callgraph", ImageType.SVG);
+        new HybridCallGraph().merge(
+                dtsFileName,
+                Scene.v().getCallGraph(),
+                hybridOutputPath,
+                "callgraph",
+                "callgraph",
+                ImageType.SVG
+        );
     }
 
     /**
