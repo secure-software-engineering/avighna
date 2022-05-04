@@ -137,7 +137,7 @@ public class DynamicCallStack {
             DotGraphEdge dotGraphEdge = null;
             boolean isFakeEdge = false;
             boolean isCallSiteSameAsCaller = false;
-            String nextMethodSignature = null;
+            String nextMethodSignature = "";
             int lineNumber = -1;
 
             StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
