@@ -95,6 +95,8 @@ public class YamlUtility {
         fakeEdgesString.add("$$FastClassBySpringCGLIB$$");
         fakeEdgesString.add("$$KeyFactoryByCGLIB$$");
 
+        fakeEdgesString.add("$$FastClassByGuice$$");
+
         dynamicAgentConfiguration.setFakeEdgesString(fakeEdgesString);
         dynamicAgentConfiguration.setTrackEdges(!commandLine.hasOption(CommandLineUtility.DONT_TRACK_FAKE_EDGE_LONG));
 
