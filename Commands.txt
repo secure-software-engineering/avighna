@@ -1,1 +1,5 @@
+Zipkin:
 java -jar .\dynamic-cg-cmd-interface-1.0-SNAPSHOT-jar-with-dependencies.jar -aj D:\Work\HybridCG\temp\Spring_Projects\zipkin\zipkin-server\target\zipkin-server-2.23.17-SNAPSHOT-exec.jar -dcj D:\Work\HybridCG\temp\hybridCG\dynamic-cg-generator\target\dynamic-cg-generator-1.0-SNAPSHOT-jar-with-dependencies.jar -od D:\Work\HybridCG\temp\Spring_Projects\zipkin\hybridCGOutput -rap zipkin2 -sdf -sif -dtf
+
+Spring Initializer Website:
+java -jar .\dynamic-cg-cmd-interface-1.0-SNAPSHOT-jar-with-dependencies.jar -aj D:\Work\HybridCG\temp\Spring_Projects\start.spring.io\start-site\target\start-site-exec.jar -dcj D:\Work\HybridCG\temp\hybridCG\dynamic-cg-generator\target\dynamic-cg-generator-1.0-SNAPSHOT-jar-with-dependencies.jar -od D:\Work\HybridCG\temp\Spring_Projects\start.spring.io\hybridCGOutput -rap io.spring.start.site -sdf -sif -dtf

@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.junit.Test;
 
@@ -36,6 +37,41 @@ public class TestTheLibrary {
         String appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
         String dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
         String hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+
+        System.out.println("Select the Project: ");
+        System.out.println("1. Bean");
+        System.out.println("2. Spring-Petclinic");
+        System.out.println("3. Fredbet");
+        System.out.println("4. Spring Initializer Website");
+        System.out.println("5. Zipkin");
+
+        int option = -1;
+
+        option = new Scanner(System.in).nextInt();
+
+        if (option == 1) { //Bean
+            appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
+            dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
+            hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+        } else if (option == 2) { //Spring-Petclinic
+            appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
+            dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
+            hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+        } else if (option == 3) { //Fredbet
+            appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
+            dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
+            hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+        } else if (option == 4) { //Spring Initializer Website
+            appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\start-site\\target\\classes";
+            dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\hybridCGOutput\\dynamic_cg.dst";
+            hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\hybridCGOutput\\hybridMergerOutput\\";
+        } else if (option == 5) { //Zipkin
+            appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
+            dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
+            hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+        } else {
+            System.exit(0);
+        }
 
         initializeSoot(appClassPath, dtsFileName);
 
