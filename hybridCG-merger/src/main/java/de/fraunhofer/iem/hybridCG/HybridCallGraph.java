@@ -248,7 +248,7 @@ public class HybridCallGraph {
     public String merge(String dtsFileName, CallGraph staticCallGraph, String rootOutputDir, String outputDotFileName) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException {
         merge(dtsFileName, staticCallGraph, rootOutputDir, true);
 
-        dotGraph.plot(outputDotFileName + "_static_cg.dot");
+        dotGraph.plot(rootOutputDir + outputDotFileName + "_static_cg.dot");
 
         hybridCGStats.setPathToStaticCGDOTGraph(new File(rootOutputDir + outputDotFileName + "_static_cg.dot").getAbsolutePath());
 
