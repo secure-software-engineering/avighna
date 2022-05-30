@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>de.fraunhofer.iem</groupId>
-        <artifactId>hybridCG</artifactId>
+        <artifactId>avighna</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hybridCG-merger</artifactId>
+    <artifactId>avighna-agent</artifactId>
     <packaging>jar</packaging>
-    <name>Hybrid CallGraph merger</name>
+    <name>Generates dynamic cg (call stack) using java agent</name>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -20,26 +20,22 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.soot-oss</groupId>
-            <artifactId>soot</artifactId>
-            <version>${soot-version}</version>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${java-assist-version}</version>
         </dependency>
         <dependency>
-            <groupId>guru.nidi</groupId>
-            <artifactId>graphviz-java</artifactId>
-            <version>0.18.1</version>
+            <groupId>de.fraunhofer.iem</groupId>
+            <artifactId>avighna-merger</artifactId>
+            <version>${current-version}</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>${yaml-version}</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
@@ -49,11 +45,7 @@
                 <version>3.2.0</version>
                 <configuration>
                     <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>de.fraunhofer.iem.hybridCG.HybridCallGraph</mainClass>
-                        </manifest>
+                        <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
             </plugin>
@@ -64,10 +56,9 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>de.fraunhofer.iem.hybridCG.HybridCallGraph</mainClass>
+                            <mainClass>de.fraunhofer.iem.DynamicCGAgent</mainClass>
                         </manifest>
+                        <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -85,4 +76,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
