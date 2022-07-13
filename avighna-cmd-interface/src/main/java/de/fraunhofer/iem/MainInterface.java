@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -20,13 +21,24 @@ public class MainInterface {
 
     private static void runApplicationWithJavaAgent(CommandLine commandLine) {
         try {
-            String cmd = "cmd.exe /c cd . & start cmd.exe /c \"java" +
+            String[] cmd;
+
+            String javaCMD = "java" +
                     " -Xbootclasspath/p:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) +
                     " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
                     " -noverify -jar " +
-                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT) + " & set /p dummy=Spring application terminated. Press enter.\"";
+                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
 
-            System.out.println(cmd);
+            if (OperatingSystemUtil.isMac()) {
+                String appleCMD = "tell app \"Terminal\"\n" +
+                        "do script \"" + javaCMD + "\"\n" +
+                        "end tell";
+                cmd = new String[]{"osascript", "-e", appleCMD};
+            } else {
+                cmd = new String[]{"cmd.exe", "/c", "cd . & start cmd.exe /c \"" + javaCMD + " & set /p dummy=Spring application terminated. Press enter.\""};
+            }
+
+            System.out.println(Arrays.toString(cmd));
             Process proc = Runtime.getRuntime().exec(cmd);
 
 //            try {
