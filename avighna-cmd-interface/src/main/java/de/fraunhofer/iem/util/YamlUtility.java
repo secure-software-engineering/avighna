@@ -10,6 +10,7 @@ import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -61,7 +62,9 @@ public class YamlUtility {
 
         DynamicAgentConfiguration dynamicAgentConfiguration = new DynamicAgentConfiguration();
 
-        dynamicAgentConfiguration.setRootPackageNameOfApplication(commandLine.getOptionValue(CommandLineUtility.ROOT_APP_PACKAGE_SHORT));
+        String rootPackages = commandLine.getOptionValue(CommandLineUtility.ROOT_APP_PACKAGE_SHORT);
+        List<String> rootPackageNames = Arrays.asList(rootPackages.split(":"));
+        dynamicAgentConfiguration.setRootPackageNameOfApplication(rootPackageNames);
 
         File file = new File(commandLine.getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT) + File.separator + "allDotFiles");
 

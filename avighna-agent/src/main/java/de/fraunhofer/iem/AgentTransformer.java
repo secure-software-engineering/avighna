@@ -20,13 +20,13 @@ import java.util.logging.Level;
  */
 public class AgentTransformer implements ClassFileTransformer {
     private final List<String> exclude = new ArrayList<>();
-    private final String rootPackageNameOfApplication;
+    private final List<String> rootPackageNameOfApplication;
     private final String rootOutputDirectory;
     public final Set<String> fakeEdges = new HashSet<>();
     public final boolean isTrackEdges;
 
     public AgentTransformer(
-            String rootPackageNameOfApplication,
+            List<String> rootPackageNameOfApplication,
             String rootOutputDirectory,
             List<String> excludeClasses,
             List<String> fakeEdges,
@@ -79,11 +79,15 @@ public class AgentTransformer implements ClassFileTransformer {
             }
         }
 
-        if (className.startsWith(this.rootPackageNameOfApplication)) {
-            return enhanceClass(className, classfileBuffer, false);
-        } else {
-            return enhanceClass(className, classfileBuffer, true);
+        for (String rootPackage : this.rootPackageNameOfApplication) {
+            if (className.startsWith(rootPackage)) {
+                return enhanceClass(className, classfileBuffer, false);
+            } else {
+                return enhanceClass(className, classfileBuffer, true);
+            }
         }
+
+        return classfileBuffer;
     }
 
     private void writeClassFile(String className, byte[] classFileBuffer) {

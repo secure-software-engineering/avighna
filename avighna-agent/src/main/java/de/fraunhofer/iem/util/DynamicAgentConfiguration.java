@@ -8,18 +8,18 @@ import java.util.List;
  * @author Ranjith Krishnamurthy
  */
 public class DynamicAgentConfiguration {
-    private String rootPackageNameOfApplication;
+    private List<String> rootPackageNameOfApplication;
     private String outputRootDirectory;
     private boolean saveCallGraphAsDotFile;
     private List<String> excludeClasses;
     private List<String> fakeEdgesString;
     private boolean isTrackEdges;
 
-    public String getRootPackageNameOfApplication() {
+    public List<String> getRootPackageNameOfApplication() {
         return rootPackageNameOfApplication;
     }
 
-    public void setRootPackageNameOfApplication(String rootPackageNameOfApplication) {
+    public void setRootPackageNameOfApplication(List<String> rootPackageNameOfApplication) {
         this.rootPackageNameOfApplication = rootPackageNameOfApplication;
     }
 
