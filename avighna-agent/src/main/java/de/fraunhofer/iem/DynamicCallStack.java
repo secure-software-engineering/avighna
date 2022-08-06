@@ -192,7 +192,7 @@ public class DynamicCallStack {
             } else if (isCallSiteSameAsCaller) {
                 associatedLibraryCall = methodSignature;
             } else {
-                associatedLibraryCall = "NA";
+                associatedLibraryCall = nextMethodSignature;
             }
 
             DirectedEdge directedEdge = new DirectedEdge(
