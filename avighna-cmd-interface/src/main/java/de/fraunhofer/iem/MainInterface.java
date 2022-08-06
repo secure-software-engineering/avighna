@@ -41,16 +41,8 @@ public class MainInterface {
             System.out.println(Arrays.toString(cmd));
             Process proc = Runtime.getRuntime().exec(cmd);
 
-//            try {
-//                Thread.sleep(60000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//
-//            while (true) {
-//                if (!proc.isAlive())
-//                    break;
-//            }
+            System.out.println("Application is running with the provided agent. " +
+                    "\nIf the application is web then, please open browser and run different requests");
 
             String closeApp = "n";
 
@@ -64,40 +56,6 @@ public class MainInterface {
                     closeApp = "n";
                 }
             }
-//            System.out.println(cmd);
-//
-//            InputStream stdErr = proc.getErrorStream();
-//            InputStreamReader isrErr = new InputStreamReader(stdErr);
-//            BufferedReader brErr = new BufferedReader(isrErr);
-//
-//            String linee = null;
-//            System.out.println("ERROR = ");
-//
-//            while (!isInterrupted) {
-//                if (brErr.ready()) {
-//                    System.out.println(brErr.readLine());
-//                }
-//            }
-//
-//            InputStream stdIn = proc.getInputStream();
-//            InputStreamReader isr = new InputStreamReader(stdIn);
-//            BufferedReader br = new BufferedReader(isr);
-//
-//            String line = null;
-//            System.out.println("OUTPUT = ");
-//
-//            while (!isInterrupted) {
-//                if (br.ready()) {
-//                    System.out.println(br.readLine());
-//                }
-//            }
-//
-//            proc.destroy();
-//
-//            if (proc.isAlive()) {
-//                proc.destroyForcibly();
-//            }
-//
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -146,23 +104,7 @@ public class MainInterface {
             e.printStackTrace();
         }
 
-        if (!CommandLineUtility.getCommandLine().hasOption(CommandLineUtility.LIST_OF_REQUEST_LONG)) {
-            System.out.println("Spring application is up and running with the provided agent. " +
-                    "\nPlease open browser and run different requests");
-
-            String closeApp = "n";
-
-            while (!closeApp.toLowerCase().equals("y") && !closeApp.toLowerCase().equals("yes")) {
-                System.out.print("Completed? Should we terminate the application and generate DTS file?   ");
-                Scanner scanner = new Scanner(System.in);
-
-                closeApp = scanner.nextLine();
-
-                if (closeApp == null || closeApp.equals("")) {
-                    closeApp = "n";
-                }
-            }
-        } else {
+        if (CommandLineUtility.getCommandLine().hasOption(CommandLineUtility.LIST_OF_REQUEST_LONG)) {
             System.out.println("Spring application is up and running with the provided agent. " +
                     "\nSending the provided requests");
             for (String request : requestFile.getRequests()) {
