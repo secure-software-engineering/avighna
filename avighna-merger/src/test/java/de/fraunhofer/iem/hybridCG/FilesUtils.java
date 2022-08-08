@@ -1,5 +1,6 @@
 package de.fraunhofer.iem.hybridCG;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +31,7 @@ public class FilesUtils {
                     (filePath, fileAttr) -> filePath.toString().endsWith(".class") && fileAttr.isRegularFile()
             ).forEach(p -> appClasses.add(p.toString()
                     .replace(path.toString(), "")
-                    .replaceAll("\\\\", ".")
+                    .replaceAll(File.separator, ".")
                     .replaceAll("^\\.", "")
                     .replaceAll("\\.class$", "")));
         } catch (IOException e) {

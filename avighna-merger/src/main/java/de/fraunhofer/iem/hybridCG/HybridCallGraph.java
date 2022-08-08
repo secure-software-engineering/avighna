@@ -31,6 +31,7 @@ import java.util.List;
  */
 public class HybridCallGraph {
     private DotGraph dotGraph = null;
+    private DotGraph staticDotGraph = null;
     private HybridCGStats hybridCGStats = null;
 
     private int numberOfEdgesInStaticCallGraph = 0;
@@ -66,6 +67,7 @@ public class HybridCallGraph {
         hybridCGStats.setPathToHybridCGDOTGraph("Not Available");
 
         dotGraph = new DotGraph("final:callgraph");
+        staticDotGraph = new DotGraph("final:callgraph");
         // Generate the initial dot-graph from the static call-graph
         generateInitialDotGraph();
 
@@ -248,7 +250,7 @@ public class HybridCallGraph {
     public String merge(String dtsFileName, CallGraph staticCallGraph, String rootOutputDir, String outputDotFileName) throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException {
         merge(dtsFileName, staticCallGraph, rootOutputDir, true);
 
-        dotGraph.plot(rootOutputDir + outputDotFileName + "_static_cg.dot");
+        staticDotGraph.plot(rootOutputDir + outputDotFileName + "_static_cg.dot");
 
         hybridCGStats.setPathToStaticCGDOTGraph(new File(rootOutputDir + outputDotFileName + "_static_cg.dot").getAbsolutePath());
 
@@ -324,13 +326,20 @@ public class HybridCallGraph {
 
             if (node_src.startsWith("<javax.") || node_tgt.startsWith("<javax.")) continue;
 
+            if (node_src.startsWith("<jdk.") || node_tgt.startsWith("<jdk.")) continue;
+
+            if (node_src.startsWith("<com.sun.crypto.provider.") || node_tgt.startsWith("<com.sun.crypto.provider.")) continue;
+
 
             DotGraphEdge dotGraphEdge = dotGraph.drawEdge(node_src, node_tgt);
+            DotGraphEdge staticDotGraphEdge = staticDotGraph.drawEdge(node_src, node_tgt);
 
             if (edge.srcStmt() == null) {
                 dotGraphEdge.setLabel("null");
+                staticDotGraphEdge.setLabel("null");
             } else {
                 dotGraphEdge.setLabel(edge.srcUnit().toString());
+                staticDotGraphEdge.setLabel(edge.srcUnit().toString());
             }
 
 
