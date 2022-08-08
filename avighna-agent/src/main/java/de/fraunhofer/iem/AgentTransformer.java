@@ -127,7 +127,7 @@ public class AgentTransformer implements ClassFileTransformer {
 
             CtMethod[] methodss = clazz.getDeclaredMethods();
             for (CtMethod method : methodss) {
-                currentlyProcessingMethod = generateSootMethodSignature(method, false, className);
+                currentlyProcessingMethod = generateSootMethodSignature(method, false, false, className);
                 if (!method.isEmpty() && !Modifier.isNative(method.getModifiers())) {
                     String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + currentlyProcessingMethod + "\"," + isLibraryCall + ");";
                     method.insertBefore(beforeCode);
@@ -139,12 +139,22 @@ public class AgentTransformer implements ClassFileTransformer {
 
             CtConstructor[] constructorMethods = clazz.getConstructors();
             for (CtConstructor constructorMethod : constructorMethods) {
-                currentlyProcessingMethod = generateSootMethodSignature(constructorMethod, true, className);
+                currentlyProcessingMethod = generateSootMethodSignature(constructorMethod, true, false, className);
                 String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + currentlyProcessingMethod + "\"," + isLibraryCall + ");";
                 constructorMethod.insertBefore(beforeCode);
 
                 String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + currentlyProcessingMethod + "\"," + isLibraryCall + ");";
                 constructorMethod.insertAfter(afterCode);
+            }
+
+            CtConstructor staticInitializer = clazz.getClassInitializer();
+            if (staticInitializer != null) {
+                currentlyProcessingMethod = generateSootMethodSignature(staticInitializer, true, true, className);
+                String beforeCode = "de.fraunhofer.iem.DynamicCallStackManager.methodCall(\"" + currentlyProcessingMethod + "\"," + isLibraryCall + ");";
+                staticInitializer.insertBefore(beforeCode);
+
+                String afterCode = "de.fraunhofer.iem.DynamicCallStackManager.methodReturn(\"" + currentlyProcessingMethod + "\"," + isLibraryCall + ");";
+                staticInitializer.insertAfter(afterCode);
             }
 
             byteCode = clazz.toBytecode();
@@ -178,7 +188,7 @@ public class AgentTransformer implements ClassFileTransformer {
         return false;
     }
 
-    private String generateSootMethodSignature(CtBehavior method, boolean isConstructor, String javassistClassName) {
+    private String generateSootMethodSignature(CtBehavior method, boolean isConstructor, boolean isStaticInitializer, String javassistClassName) {
         String className = javassistClassName.replaceAll("/", ".");
         String returnType = "NA";
         String methodName = "";
@@ -187,7 +197,10 @@ public class AgentTransformer implements ClassFileTransformer {
         if (isConstructor) {
             returnType = "void";
 
-            methodName = "<init>";
+            if (isStaticInitializer)
+                methodName = "<clinit>";
+            else
+                methodName = "<init>";
         } else {
             try {
                 returnType = ((CtMethod) method).getReturnType().getName();
