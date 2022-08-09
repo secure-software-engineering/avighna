@@ -13,14 +13,14 @@ public class CommandLineUtility {
      */
     public static final String APP_JAR_SHORT = "aj";
     public static final String APP_JAR_LONG = "app-jar";
-    public static final String DYNAMIC_CG_GEN_SHORT = "dcj";
-    public static final String DYNAMIC_CG_GEN_LONG = "dynamic-cg-gen-jar";
+    public static final String DYNAMIC_CG_GEN_SHORT = "aaj";
+    public static final String DYNAMIC_CG_GEN_LONG = "avighna-agent-jar";
     public static final String LIST_OF_REQUEST_SHORT = "lrf";
     public static final String LIST_OF_REQUEST_LONG = "list-request-file";
     public static final String OUT_ROOT_DIR_SHORT = "od";
     public static final String OUT_ROOT_DIR_LONG = "out-root-dir";
     public static final String ROOT_APP_PACKAGE_SHORT = "rap";
-    public static final String ROOT_APP_PACKAGE_LONG = "root-app-package";
+    public static final String ROOT_APP_PACKAGE_LONG = "root-app-packages";
     public static final String SAVE_DOT_FILE_SHORT = "sdf";
     public static final String SAVE_DOT_FILE_LONG = "save-dot-files";
     public static final String SAVE_IMG_FILE_SHORT = "sif";
@@ -47,14 +47,14 @@ public class CommandLineUtility {
                 APP_JAR_SHORT,
                 APP_JAR_LONG,
                 true,
-                "Path of the application jar file");
+                "Path of the application jar file to generate dynamic information");
         appJarFile.setRequired(true);
 
         Option jarFile = new Option(
                 DYNAMIC_CG_GEN_SHORT,
                 DYNAMIC_CG_GEN_LONG,
                 true,
-                "Path of the dynamic cg generator jar file");
+                "Path of the avighna agent jar file");
         jarFile.setRequired(true);
 
         Option reqFile = new Option(
@@ -74,7 +74,7 @@ public class CommandLineUtility {
                 ROOT_APP_PACKAGE_SHORT,
                 ROOT_APP_PACKAGE_LONG,
                 true,
-                "Root application package for generating the dynamic cg");
+                "Root application package(s) for generating the dynamic cg. Multiple packages are seperated by :");
         rootAppPackage.setRequired(true);
 
         Option saveDotFiles = new Option(
@@ -118,8 +118,8 @@ public class CommandLineUtility {
             // Parse the command line arguments
             commandLine = commandLineParser.parse(cmdOptions, args);
         } catch (ParseException ex) {
-            helpFormatter.printHelp("dynamic-cg-interface", cmdOptions);
-            return;
+            helpFormatter.printHelp("avighna-cmd-interface", cmdOptions);
+            System.exit(-1);
         }
     }
 
