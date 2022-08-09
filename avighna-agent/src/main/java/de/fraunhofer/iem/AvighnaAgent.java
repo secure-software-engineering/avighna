@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
-import java.net.JarURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -19,7 +18,7 @@ import java.util.logging.Level;
  *
  * @author Ranjith Krishnamurthy
  */
-public class DynamicCGAgent {
+public class AvighnaAgent {
     public static DynamicAgentConfiguration dynamicAgentConfiguration;
 
     /**
@@ -35,17 +34,7 @@ public class DynamicCGAgent {
         // Load the YAML settings file
         dynamicAgentConfiguration = YamlUtil.parse(argument);
 
-        //add jar class loader
-        try {
-            JarURLConnection connection = (JarURLConnection) DynamicCGAgent.class.getResource("DynamicCGAgent.class").openConnection();
-            instrumentation.appendToBootstrapClassLoaderSearch(connection.getJarFile());
-        } catch (IOException e) {
-            LoggerUtil.getLOGGER().log(Level.SEVERE, "Something went wrong while setting the class loader = " + e.getMessage());
-            System.exit(-1);
-        }
-
-
-        LoggerUtil.getLOGGER().info("Checking the given root output directory = " + DynamicCGAgent.dynamicAgentConfiguration.getOutputRootDirectory());
+        LoggerUtil.getLOGGER().info("Checking the given root output directory = " + AvighnaAgent.dynamicAgentConfiguration.getOutputRootDirectory());
         File rootOutputDirectory = new File(dynamicAgentConfiguration.getOutputRootDirectory());
 
         if (rootOutputDirectory.exists()) {
@@ -116,7 +105,7 @@ public class DynamicCGAgent {
 
         LoggerUtil.getLOGGER().info("Instrumentation begins");
         instrumentation.addTransformer(
-                new AgentTransformer(
+                new AvighnaAgentTransformer(
                         applicationRootPackage,
                         dynamicAgentConfiguration.getOutputRootDirectory(),
                         dynamicAgentConfiguration.getExcludeClasses(),
