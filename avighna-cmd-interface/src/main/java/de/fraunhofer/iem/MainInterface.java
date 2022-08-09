@@ -27,7 +27,17 @@ public class MainInterface {
                     " -Xbootclasspath/p:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) +
                     " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
                     " -noverify -jar " +
-                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT) + " eclipse -s small";
+                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
+
+            if (commandLine.hasOption(CommandLineUtility.DACAPO_ARG_SHORT)) {
+                String[] args = commandLine.getOptionValue(CommandLineUtility.DACAPO_ARG_LONG).split(":");
+
+                if (args.length != 2) {
+                    System.out.println("Given DACAPO argument is invalid. The valid format is <DACAPO application>:<size>");
+                }
+
+                javaCMD += " " + args[0] + " -s " + args[1];
+            }
 
             if (OperatingSystemUtil.isMac()) {
                 String appleCMD = "tell app \"Terminal\"\n" +
@@ -85,12 +95,6 @@ public class MainInterface {
             }
         });
         t1.start();
-
-
-//        while (true) {
-//            if (tempFile.exists())
-//                break;
-//        }
 
         while (true) {
             if (!t1.isAlive()) {

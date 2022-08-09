@@ -13,6 +13,9 @@ public class CommandLineUtility {
      */
     public static final String APP_JAR_SHORT = "aj";
     public static final String APP_JAR_LONG = "app-jar";
+
+    public static final String DACAPO_ARG_SHORT = "dar";
+    public static final String DACAPO_ARG_LONG = "dacapo-app-arg";
     public static final String DYNAMIC_CG_GEN_SHORT = "aaj";
     public static final String DYNAMIC_CG_GEN_LONG = "avighna-agent-jar";
     public static final String LIST_OF_REQUEST_SHORT = "lrf";
@@ -57,6 +60,13 @@ public class CommandLineUtility {
                 "Path of the avighna agent jar file");
         jarFile.setRequired(true);
 
+        Option dacapoAppArg = new Option(
+                DACAPO_ARG_SHORT,
+                DACAPO_ARG_LONG,
+                true,
+                "Arguments to the DACAPO application. The value format is <dacapo application>:<data size>. These provided arguments will be appended after the given application jar file to the final command");
+        appJarFile.setRequired(false);
+
         Option reqFile = new Option(
                 LIST_OF_REQUEST_SHORT,
                 LIST_OF_REQUEST_LONG,
@@ -100,6 +110,7 @@ public class CommandLineUtility {
 
         cmdOptions.addOption(appJarFile);
         cmdOptions.addOption(jarFile);
+        cmdOptions.addOption(dacapoAppArg);
         cmdOptions.addOption(reqFile);
         cmdOptions.addOption(outDir);
         cmdOptions.addOption(rootAppPackage);
