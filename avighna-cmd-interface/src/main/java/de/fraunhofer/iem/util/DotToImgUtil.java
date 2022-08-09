@@ -1,8 +1,7 @@
 package de.fraunhofer.iem.util;
 
 import de.fraunhofer.iem.MainInterface;
-import guru.nidi.graphviz.engine.Format;
-import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.engine.*;
 import org.apache.commons.cli.CommandLine;
 
 import java.io.File;
@@ -11,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class to convert the DOT file to image file
@@ -26,6 +26,9 @@ public class DotToImgUtil {
      */
     private static void saveDotAsSVG(String dotFileName, String outputImageFileName) {
         try {
+            GraphvizCmdLineEngine engine = new GraphvizCmdLineEngine();
+            engine.timeout(5, TimeUnit.MINUTES);
+            Graphviz.useEngine(engine);
             Graphviz.fromFile(new File(dotFileName)).render(Format.SVG).toFile(new File(outputImageFileName));
         } catch (IOException e) {
             e.printStackTrace();
