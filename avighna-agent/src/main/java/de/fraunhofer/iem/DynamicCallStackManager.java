@@ -58,7 +58,7 @@ public class DynamicCallStackManager {
                 dynamicCallStack.methodCall(methodSignature);
             }
         } catch (Exception | Error e) {
-            LoggerUtil.getLOGGER().log(Level.SEVERE, "Error = " + e.getMessage());
+            LoggerUtil.getLOGGER().log(Level.SEVERE, "Error (" + e.getClass().getName() + ") = " + e.getMessage());
             e.printStackTrace();
         }
     }

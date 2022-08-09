@@ -9,10 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 
@@ -156,11 +153,17 @@ public class DynamicCallStack {
                     String temp1 = methodSignature.split(": ")[0] +
                             "." + methodSignature.split(": ")[1].split(" ")[1];
 
-                    if (temp1.startsWith(nextMethodSignature + "(")) {
-                        isCallSiteSameAsCaller = true;
-                    }
 
-                    break;
+                    if (!nextMethodSignature.startsWith("de.fraunhofer.iem.DynamicCallStackManager")) {
+                        if (temp1.startsWith(nextMethodSignature + "(")) {
+                            isCallSiteSameAsCaller = true;
+                        }
+
+                        break;
+                    } else {
+                        nextMethodSignature = "";
+                        lineNumber = -1;
+                    }
                 }
             }
 
@@ -250,7 +253,11 @@ public class DynamicCallStack {
 //            writeRequest();
         } else if (this.continuousCallStack.size() > 0) {
             this.continuousCallStack.remove(this.continuousCallStack.size() - 1);
-            this.isAssociatedLibraryCallPresent = true;
+
+            if (associatedLibraryCallStack.size() > 0)
+                this.isAssociatedLibraryCallPresent = true;
+            else
+                this.isAssociatedLibraryCallPresent = false;
         }
     }
 
@@ -281,8 +288,5 @@ public class DynamicCallStack {
             dotGraph.plot(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot");
             LoggerUtil.getLOGGER().info("DOT file of Dynamic CG dumped to the file = " + new File(outputRootDirectory + System.getProperty("file.separator") + "dynamic_callgraph_" + this.pid + ".dot").getAbsolutePath().toString());
         }
-
-//        writeToFile();
-//        callStack.clear();
     }
 }

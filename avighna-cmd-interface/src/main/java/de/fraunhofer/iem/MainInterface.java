@@ -27,7 +27,7 @@ public class MainInterface {
                     " -Xbootclasspath/p:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) +
                     " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
                     " -noverify -jar " +
-                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
+                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT) + " eclipse -s small";
 
             if (OperatingSystemUtil.isMac()) {
                 String appleCMD = "tell app \"Terminal\"\n" +
