@@ -7,6 +7,7 @@ import de.fraunhofer.iem.exception.DtsZipUtilException;
 import de.fraunhofer.iem.util.*;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.engine.GraphvizCmdLineEngine;
 import soot.*;
 import soot.jimple.InvokeExpr;
 import soot.jimple.Stmt;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class merges the dynamically generated EdgesInAGraphs into the statically generated call graph
@@ -304,6 +306,9 @@ public class HybridCallGraph {
      */
     private void saveDotAsImageFile(String dotFileName, String outputImageFileName, Format format) throws DotToImgException {
         try {
+            GraphvizCmdLineEngine engine = new GraphvizCmdLineEngine();
+            engine.timeout(5, TimeUnit.MINUTES);
+            Graphviz.useEngine(engine);
             Graphviz.fromFile(new File(dotFileName)).render(format).toFile(new File(outputImageFileName));
         } catch (IOException e) {
             throw new DotToImgException("Could not convert DOT to image file." + "\nMessage = " + e.getMessage());
