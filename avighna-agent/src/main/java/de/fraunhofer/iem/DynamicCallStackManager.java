@@ -21,12 +21,13 @@ public class DynamicCallStackManager {
      * @return Dynamic CG if present otherwise returns null
      */
     private static DynamicCallStack getDynamicCallStack(long id) {
-        for (DynamicCallStack dynamicCallStack : myDynamicCallStack) {
-            if (dynamicCallStack.getPid() == id) {
-                return dynamicCallStack;
+        synchronized (myDynamicCallStack) {
+            for (DynamicCallStack dynamicCallStack : myDynamicCallStack) {
+                if (dynamicCallStack.getPid() == id) {
+                    return dynamicCallStack;
+                }
             }
         }
-
         return null;
     }
 
