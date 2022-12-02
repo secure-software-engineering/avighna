@@ -1,5 +1,6 @@
 package de.fraunhofer.iem.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,17 +9,17 @@ import java.util.List;
  * @author Ranjith Krishnamurthy
  */
 public class DynamicAgentConfiguration {
-    private String rootPackageNameOfApplication;
+    private List<String> rootPackageNameOfApplication;
     private String outputRootDirectory;
     private boolean saveCallGraphAsDotFile;
     private List<String> excludeClasses;
     private List<String> fakeEdgesString;
 
-    public String getRootPackageNameOfApplication() {
+    public List<String> getRootPackageNameOfApplication() {
         return rootPackageNameOfApplication;
     }
 
-    public void setRootPackageNameOfApplication(String rootPackageNameOfApplication) {
+    public void setRootPackageNameOfApplication(ArrayList<String> rootPackageNameOfApplication) {
         this.rootPackageNameOfApplication = rootPackageNameOfApplication;
     }
 

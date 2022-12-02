@@ -81,7 +81,7 @@ public class CommandLineUtility {
                 ROOT_APP_PACKAGE_SHORT,
                 ROOT_APP_PACKAGE_LONG,
                 true,
-                "Root application package for generating the dynamic cg");
+                "Root application package for generating the dynamic cg. For multiple use the ; as separator.");
         rootAppPackage.setRequired(true);
 
         Option saveDotFiles = new Option(

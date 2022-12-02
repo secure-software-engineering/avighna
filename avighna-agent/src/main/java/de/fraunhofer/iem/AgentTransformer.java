@@ -19,10 +19,10 @@ import java.util.List;
  */
 public class AgentTransformer implements ClassFileTransformer {
     private final List<String> exclude = new ArrayList<>();
-    private final String rootPackageNameOfApplication;
+    private final List<String> rootPackageNameOfApplication;
     private final String rootOutputDirectory;
 
-    public AgentTransformer(String rootPackageNameOfApplication, String rootOutputDirectory, List<String> excludeClasses) {
+    public AgentTransformer(List<String> rootPackageNameOfApplication, String rootOutputDirectory, List<String> excludeClasses) {
         this.rootPackageNameOfApplication = rootPackageNameOfApplication;
         this.rootOutputDirectory = rootOutputDirectory;
         this.exclude.addAll(excludeClasses);
@@ -50,11 +50,15 @@ public class AgentTransformer implements ClassFileTransformer {
             }
         }
 
-        if (className.startsWith(this.rootPackageNameOfApplication)) {
-            return enhanceClass(className, classfileBuffer, false);
-        } else {
-            return enhanceClass(className, classfileBuffer, true);
+        for (String rootPackage : this.rootPackageNameOfApplication) {
+            if (className.startsWith(rootPackage)) {
+                return enhanceClass(className, classfileBuffer, false);
+            } else {
+                return enhanceClass(className, classfileBuffer, true);
+            }
         }
+
+        return classfileBuffer;
     }
 
     /**
