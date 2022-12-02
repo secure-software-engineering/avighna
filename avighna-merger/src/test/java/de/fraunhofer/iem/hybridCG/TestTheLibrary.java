@@ -26,17 +26,10 @@ public class TestTheLibrary {
     @Test
     public void test() throws UnexpectedError, DtsSerializeUtilException, DtsZipUtilException, DotToImgException, FileNotFoundException {
         //TODO: Alter this based on your testing
-//        String appClassPath = "D:\\cgbench\\CGBench\\bean\\target\\classes";
-//        String appClassPath = "D:\\Work\\HybridCG\\spring-petclinic\\target\\classes";
-//        String appClassPath = "D:\\Work\\HybridCG\\temp\\Test\\target\\classes";
-//        String appClassPath = "D:\\Work\\HybridCG\\temp\\fredbet\\target\\classes";
-//        String appClassPath = "D:\\Work\\HybridCG\\temp\\initializr\\start.spring.io\\start-site\\target\\classes";
-//        String appClassPath = "C:\\Users\\Ranjith\\Downloads\\zipkin-server-2.23.16-exec\\BOOT-INF\\classes";
-//        String appClassPath = "C:\\Users\\Ranjith\\Downloads\\streamflow-0.13.0\\streamflow-0.13.0\\lib\\streamflow-app-jar-0.13.0";
 
-        String appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
-        String dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
-        String hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+        String appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/target/classes";
+        String dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/avighna-output/dynamic_cg.dst";
+        String hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/avighna-output/hybridMergerOutput/";
 
         System.out.println("Select the Project: ");
         System.out.println("1. Bean");
@@ -44,6 +37,7 @@ public class TestTheLibrary {
         System.out.println("3. Fredbet");
         System.out.println("4. Spring Initializer Website");
         System.out.println("5. Zipkin");
+        System.out.println("6. Reflection Test Suite");
 
         int option = -1;
 
@@ -58,9 +52,9 @@ public class TestTheLibrary {
             dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
             hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
         } else if (option == 3) { //Fredbet
-            appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
-            dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
-            hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+            appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/fredbet/target/classes";
+            dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/fredbet/avighna-output/dynamic_cg.dst";
+            hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/fredbet/avighna-output/hybridMergerOutput/";
         } else if (option == 4) { //Spring Initializer Website
             appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\start-site\\target\\classes";
             dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\hybridCGOutput\\dynamic_cg.dst";
@@ -69,6 +63,10 @@ public class TestTheLibrary {
             appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
             dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
             hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+        } else if (option == 6) { //Reflection Test Suite
+            appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/target/classes";
+            dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/avighna-output/dynamic_cg.dst";
+            hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/avighna-output/hybridMergerOutput/";
         } else {
             System.exit(0);
         }
@@ -112,10 +110,13 @@ public class TestTheLibrary {
 
         List<String> appClasses = new ArrayList<>(FilesUtils.getClassesAsList(appClassPath));
 
-        appClasses.addAll(new ArrayList<>(FilesUtils.getClassesAsList(dynamicCP)));
+        if (new File(dynamicCP).exists()) {
+            appClasses.addAll(new ArrayList<>(FilesUtils.getClassesAsList(dynamicCP)));
+        }
 
         List<SootMethod> entries = new ArrayList<SootMethod>();
         for (String appClass : appClasses) {
+            System.out.println(appClass);
             SootClass sootClass = Scene.v().forceResolve(appClass, SootClass.BODIES);
             sootClass.setApplicationClass();
             entries.addAll(sootClass.getMethods());
