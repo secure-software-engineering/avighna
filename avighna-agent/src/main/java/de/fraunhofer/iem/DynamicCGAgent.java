@@ -8,6 +8,8 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.lang.instrument.Instrumentation;
 import java.net.JarURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -101,7 +103,11 @@ public class DynamicCGAgent {
             System.exit(-1);
         }
 
-        String applicationRootPackage = dynamicAgentConfiguration.getRootPackageNameOfApplication().replaceAll("\\.", "/") + "/";
+        ArrayList<String> applicationRootPackage = new ArrayList<>();
+
+        for (String rootPackage : dynamicAgentConfiguration.getRootPackageNameOfApplication()) {
+            applicationRootPackage.add(rootPackage.replaceAll("\\.", "/") + "/");
+        }
 
         LoggerUtil.getLOGGER().info("Root application package name = " + applicationRootPackage);
         LoggerUtil.getLOGGER().info("Save Dynamic CG as DOT file? = " + dynamicAgentConfiguration.isSaveCallGraphAsDotFile());
