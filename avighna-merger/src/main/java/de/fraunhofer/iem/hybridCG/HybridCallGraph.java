@@ -134,7 +134,7 @@ public class HybridCallGraph {
                     }
                 } else {
                     //TODO: If needed then add the fake edge here
-                    //++numberOfFakeEdges;
+                    ++numberOfFakeEdges;
                 }
             }
         }
