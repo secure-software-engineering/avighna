@@ -8,13 +8,13 @@ import java.util.List;
  * @author Ranjith Krishnamurthy
  */
 public class RequestFile {
-    private List<String> requests;
+    private List<CurlCmd> requests;
 
-    public List<String> getRequests() {
+    public List<CurlCmd> getRequests() {
         return requests;
     }
 
-    public void setRequests(List<String> requests) {
+    public void setRequests(List<CurlCmd> requests) {
         this.requests = requests;
     }
 }
