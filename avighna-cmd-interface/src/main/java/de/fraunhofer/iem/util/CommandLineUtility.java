@@ -14,6 +14,12 @@ public class CommandLineUtility {
     public static final String APP_JAR_SHORT = "aj";
     public static final String APP_JAR_LONG = "app-jar";
 
+    public static final String APP_ARG_SHORT = "aa";
+    public static final String APP_ARG_LONG = "app-arg";
+
+    public static final String SINGLE_RUN_APP_SHORT = "sra";
+    public static final String SINGLE_RUN_APP_LONG = "single-run-app";
+
     public static final String DACAPO_ARG_SHORT = "dar";
     public static final String DACAPO_ARG_LONG = "dacapo-app-arg";
     public static final String DYNAMIC_CG_GEN_SHORT = "aaj";
@@ -52,6 +58,18 @@ public class CommandLineUtility {
                 true,
                 "Path of the application jar file to generate dynamic information");
         appJarFile.setRequired(true);
+
+        Option appArg = new Option(
+                APP_ARG_SHORT,
+                APP_ARG_LONG,
+                true,
+                "Program arguments for the given application. If multiple arguments then separate it by :");
+
+        Option singleRunApp = new Option(
+                SINGLE_RUN_APP_SHORT,
+                SINGLE_RUN_APP_LONG,
+                false,
+                "This argument indicates that the given app is a single run and not the web application which runs infinitely until explicitly terminated.");
 
         Option jarFile = new Option(
                 DYNAMIC_CG_GEN_SHORT,
@@ -109,6 +127,8 @@ public class CommandLineUtility {
         );
 
         cmdOptions.addOption(appJarFile);
+        cmdOptions.addOption(appArg);
+        cmdOptions.addOption(singleRunApp);
         cmdOptions.addOption(jarFile);
         cmdOptions.addOption(dacapoAppArg);
         cmdOptions.addOption(reqFile);

@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -19,54 +20,109 @@ public class MainInterface {
 
     private static boolean isInterrupted = false;
 
+    private static Process getCompleteCmd(String javaCmd) throws IOException {
+        String[] cmd;
+
+        if (OperatingSystemUtil.isMac()) {
+            String appleCMD = "tell app \"Terminal\"\n" +
+                    "do script \"" + javaCmd + "\"\n" +
+                    "end tell";
+            cmd = new String[]{"osascript", "-e", appleCMD};
+        } else {
+            cmd = new String[]{"cmd.exe", "/c", "cd . & start cmd.exe /c \"" + javaCmd + " & set /p dummy=Spring application terminated. Press enter.\""};
+        }
+
+        System.out.println(Arrays.toString(cmd));
+
+        return Runtime.getRuntime().exec(cmd);
+    }
+
     private static void runApplicationWithJavaAgent(CommandLine commandLine) {
         try {
-            String[] cmd;
-
-            String javaCMD = "java" +
+            StringBuilder javaCMD = new StringBuilder("java" +
                     " -Xbootclasspath/p:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) +
                     " -javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile +
                     " -noverify -jar " +
-                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT);
+                    commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT));
 
-            if (commandLine.hasOption(CommandLineUtility.DACAPO_ARG_SHORT)) {
+            if (commandLine.hasOption(CommandLineUtility.APP_ARG_SHORT)) {
+                for (String arg : commandLine.getOptionValue(CommandLineUtility.APP_ARG_SHORT).split(":")) {
+                    javaCMD.append(" ").append(arg);
+                }
+            }
+
+            if (CommandLineUtility.getCommandLine().hasOption(CommandLineUtility.LIST_OF_REQUEST_LONG)) {
+                String[] cmd = {
+                        "java",
+                        "-Xbootclasspath/p:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG),
+                        "-javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile,
+                        "-noverify",
+                        "-jar",
+                        commandLine.getOptionValue(CommandLineUtility.APP_JAR_SHORT)
+                };
+
+                Process process = Runtime.getRuntime().exec(cmd);
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println("Spring application is up and running with the provided agent. " +
+                        "\nSending the provided requests");
+                for (CurlCmd curlCmd : requestFile.getRequests()) {
+                    try {
+                        System.out.println("Executing = " + Arrays.toString(curlCmd.getCurlCmd()));
+                        Runtime.getRuntime().exec(curlCmd.getCurlCmd()).waitFor();
+                        Thread.sleep(3000);
+                    } catch (IOException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                process.destroy();
+            } else if (commandLine.hasOption(CommandLineUtility.DACAPO_ARG_SHORT)) {
                 String[] args = commandLine.getOptionValue(CommandLineUtility.DACAPO_ARG_LONG).split(":");
 
                 if (args.length != 2) {
                     System.out.println("Given DACAPO argument is invalid. The valid format is <DACAPO application>:<size>");
                 }
 
-                javaCMD += " " + args[0] + " -s " + args[1];
-            }
-
-            if (OperatingSystemUtil.isMac()) {
-                String appleCMD = "tell app \"Terminal\"\n" +
-                        "do script \"" + javaCMD + "\"\n" +
-                        "end tell";
-                cmd = new String[]{"osascript", "-e", appleCMD};
+                javaCMD.append(" ").append(args[0]).append(" -s ").append(args[1]);
+            } else if (commandLine.hasOption(CommandLineUtility.SINGLE_RUN_APP_SHORT)) {
+                Process process = getCompleteCmd(javaCMD.toString());
+                process.waitFor(30, TimeUnit.MINUTES);
             } else {
-                cmd = new String[]{"cmd.exe", "/c", "cd . & start cmd.exe /c \"" + javaCMD + " & set /p dummy=Spring application terminated. Press enter.\""};
-            }
+                Process process = getCompleteCmd(javaCMD.toString());
 
-            System.out.println(Arrays.toString(cmd));
-            Process proc = Runtime.getRuntime().exec(cmd);
 
-            System.out.println("Application is running with the provided agent. " +
-                    "\nIf the application is web then, please open browser and run different requests");
 
-            String closeApp = "n";
+                System.out.println("Application is running with the provided agent. " +
+                        "\nIf the application is web then, please open browser and run different requests");
 
-            while (!closeApp.toLowerCase().equals("y") && !closeApp.toLowerCase().equals("yes")) {
-                System.out.print("Completed? Should we terminate the application and generate DTS file?   ");
-                Scanner scanner = new Scanner(System.in);
+                String closeApp = "n";
 
-                closeApp = scanner.nextLine();
+                while (!closeApp.toLowerCase().equals("y") && !closeApp.toLowerCase().equals("yes")) {
+                    System.out.print("Completed? Should we terminate the application and generate DTS file?   ");
+                    Scanner scanner = new Scanner(System.in);
 
-                if (closeApp == null || closeApp.equals("")) {
-                    closeApp = "n";
+                    closeApp = scanner.nextLine();
+
+                    if (closeApp == null || closeApp.equals("")) {
+                        closeApp = "n";
+                    }
                 }
             }
-        } catch (IOException e) {
+
+
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -99,26 +155,6 @@ public class MainInterface {
         while (true) {
             if (!t1.isAlive()) {
                 break;
-            }
-        }
-
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        if (CommandLineUtility.getCommandLine().hasOption(CommandLineUtility.LIST_OF_REQUEST_LONG)) {
-            System.out.println("Spring application is up and running with the provided agent. " +
-                    "\nSending the provided requests");
-            for (String request : requestFile.getRequests()) {
-                try {
-                    System.out.println("Executing = " + request);
-                    Runtime.getRuntime().exec(request).waitFor();
-                    Thread.sleep(3000);
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
         }
 
