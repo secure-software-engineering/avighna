@@ -6,7 +6,7 @@ public class OperatingSystemUtil {
     public static String getOs() {
         if (os == null) {
             os = System.getProperty("os.name");
-            System.out.println(os);
+            LoggerUtil.getLOGGER().info("Current Operating System is " + os);
         }
 
         return os;

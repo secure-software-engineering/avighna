@@ -1,6 +1,7 @@
 package de.fraunhofer.iem.util;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.logging.Log;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -11,7 +12,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ZipUtil {
-    public static void generateDTS(CommandLine commandLine) {
+    public static void generateDst(CommandLine commandLine) {
         ArrayList<String> dotFiles = new ArrayList<>();
         try {
             Files.walk(Paths.get(CommandLineUtility.getCommandLine().getOptionValue(CommandLineUtility.OUT_ROOT_DIR_SHORT) + File.separator + "allDotFiles" + File.separator))
@@ -34,7 +35,7 @@ public class ZipUtil {
             zos.close();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerUtil.getLOGGER().warning("Something went wrong while generating DST file = " + e.getMessage());
         }
     }
 

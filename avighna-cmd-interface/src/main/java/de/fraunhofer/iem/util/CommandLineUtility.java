@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class CommandLineUtility {
     /**
@@ -155,25 +156,27 @@ public class CommandLineUtility {
     }
 
     public static void validateCommandLineOptions() {
+        LoggerUtil.getLOGGER().info("Validating provided commandline options.");
+
         String appJarFilePath = commandLine.getOptionValue(CommandLineUtility.APP_JAR_LONG);
         String jarFilePath = commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG);
         String outDirPath = commandLine.getOptionValue(CommandLineUtility.OUT_ROOT_DIR_LONG);
 
         // Verify given app jar file path
-        File appJarFile = new File(jarFilePath);
+        File appJarFile = new File(appJarFilePath);
 
         if (appJarFile.exists()) {
             if (appJarFile.isFile()) {
                 if (!appJarFile.getName().endsWith(".jar")) {
-                    System.out.println("Given application jar file (" + appJarFilePath + ") is invalid");
+                    LoggerUtil.getLOGGER().severe("Given application jar file (" + appJarFilePath + ") is invalid");
                     System.exit(-1);
                 }
             } else {
-                System.out.println("Given application jar file (" + appJarFilePath + ") is not a file");
+                LoggerUtil.getLOGGER().severe("Given application jar file (" + appJarFilePath + ") is not a file");
                 System.exit(-1);
             }
         } else {
-            System.out.println("Given application jar file (" + appJarFilePath + ") does not exist");
+            LoggerUtil.getLOGGER().severe("Given application jar file (" + appJarFilePath + ") does not exist");
             System.exit(-1);
         }
 
@@ -183,23 +186,16 @@ public class CommandLineUtility {
         if (jarFile.exists()) {
             if (jarFile.isFile()) {
                 if (!jarFile.getName().endsWith(".jar")) {
-                    System.out.println("Given dynamic-cg-generator jar file (" + jarFilePath + ") is invalid");
+                    LoggerUtil.getLOGGER().severe("Given avighna-agent jar file (" + jarFilePath + ") is invalid");
                     System.exit(-1);
                 }
             } else {
-                System.out.println("Given dynamic-cg-generator jar file (" + jarFilePath + ") is not a file");
+                LoggerUtil.getLOGGER().severe("Given avighna-agent jar file (" + jarFilePath + ") is not a file");
                 System.exit(-1);
             }
         } else {
-            System.out.println("Given dynamic-cg-generator jar file (" + jarFilePath + ") does not exist");
+            LoggerUtil.getLOGGER().severe("Given avighna-agent jar file (" + jarFilePath + ") does not exist");
             System.exit(-1);
-        }
-
-        if (commandLine.hasOption(CommandLineUtility.LIST_OF_REQUEST_LONG)) {
-            String reqFilePath = commandLine.getOptionValue(CommandLineUtility.LIST_OF_REQUEST_LONG);
-
-            //Verify given request file path and set the requestFile
-            MainInterface.requestFile.setRequests(YamlUtility.parseRequestYamlFile(reqFilePath).getRequests());
         }
 
         // Verify given output dir
@@ -207,20 +203,45 @@ public class CommandLineUtility {
 
         if (outDir.exists()) {
             if (outDir.isFile()) {
-                System.out.println("Given root out directory (" + jarFilePath + ") is not a directory");
+                LoggerUtil.getLOGGER().severe("Given root out directory (" + outDir + ") is not a directory");
                 System.exit(-1);
             } else {
                 try {
                     FileUtils.deleteDirectory(outDir);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LoggerUtil.getLOGGER().severe("Given root out directory (" + outDir + ") already exists and failed to delete this directory.");
+                    System.exit(-1);
                 }
             }
-        } else {
-            if (!outDir.mkdirs()) {
-                System.out.println("Given root out directory (" + jarFilePath + ") does not exist and we could not create one");
+        }
+
+        if (!outDir.mkdirs()) {
+            LoggerUtil.getLOGGER().severe("Given root out directory (" + outDir + ") does not exist and we could not create one.");
+            System.exit(-1);
+        }
+
+        // Verify given request yaml file
+        if (CommandLineUtility.getCommandLine().hasOption(CommandLineUtility.LIST_OF_REQUEST_LONG)) {
+            String requestFilePath = CommandLineUtility.getCommandLine().getOptionValue(CommandLineUtility.LIST_OF_REQUEST_LONG);
+            File requestFile = new File(requestFilePath);
+
+            if (requestFile.exists()) {
+                if (requestFile.isFile()) {
+                    if (!requestFile.getName().endsWith(".yaml") && !requestFile.getName().endsWith(".yml")) {
+                        LoggerUtil.getLOGGER().severe("Given request file (" + requestFilePath + ") is not yaml file");
+                        System.exit(-1);
+                    }
+                } else {
+                    LoggerUtil.getLOGGER().severe("Given request file (" + requestFilePath + ") is not a file");
+                    System.exit(-1);
+                }
+            } else {
+                LoggerUtil.getLOGGER().severe("Given request file (" + requestFilePath + ") does not exist");
                 System.exit(-1);
             }
+
+            //Verify given request file path and set the requestFile
+            MainInterface.requestFile.setRequests(YamlUtility.parseRequestYamlFile(requestFilePath).getRequests());
         }
     }
 }

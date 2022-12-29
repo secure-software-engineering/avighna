@@ -32,10 +32,10 @@ public class YamlUtility {
 
             return yaml.load(inputStream);
         } catch (FileNotFoundException e) {
-            System.out.println("FileNotFoundException = " + e.getMessage());
+            LoggerUtil.getLOGGER().severe("FileNotFoundException = " + e.getMessage());
             System.exit(-1);
         } catch (Exception e) {
-            System.out.println("Invalid key value in the given YAML file = " + e.getMessage());
+            LoggerUtil.getLOGGER().severe("Invalid key value in the given YAML file = " + e.getMessage());
             System.exit(-1);
         }
 
@@ -49,6 +49,8 @@ public class YamlUtility {
      * @return Path of the generates settings file
      */
     public static String generateAgentSettingsFile(CommandLine commandLine) {
+        LoggerUtil.getLOGGER().info("Generating avighna-agent configuration file.");
+
         DumperOptions options = new DumperOptions();
         options.setIndent(2);
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -108,7 +110,7 @@ public class YamlUtility {
         try {
             yaml.dump(dynamicAgentConfiguration, new FileWriter(settingsFile));
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerUtil.getLOGGER().severe("Could not dump the avighna-agent configuration to a yaml file = " + e.getMessage());
             System.exit(-1);
         }
 
