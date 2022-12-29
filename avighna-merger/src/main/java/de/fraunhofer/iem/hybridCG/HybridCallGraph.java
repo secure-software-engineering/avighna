@@ -10,7 +10,11 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.engine.GraphvizCmdLineEngine;
 import soot.*;
 import soot.jimple.InvokeExpr;
+import soot.jimple.Jimple;
+import soot.jimple.JimpleBody;
 import soot.jimple.Stmt;
+import soot.jimple.internal.JInvokeStmt;
+import soot.jimple.internal.JStaticInvokeExpr;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
 import soot.util.dot.DotGraph;
@@ -20,10 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,13 +43,55 @@ public class HybridCallGraph {
     private int numberOfEdgesWithDifferentCallSiteMethod = 0;
     private int numberOfFakeEdges = 0;
 
+    private int numberOfGodEdges = 0;
+
+    private HashSet<String> listOfAddedGodEdges = new HashSet<>();
+
     private String pathToStaticCGDOTGraph;
     private String pathToHybridCGDOTGraph;
     private String pathToStaticCGIMGGraph;
     private String pathToHybridCGIMGGraph;
 
+    private JimpleBody godJimpleBody = null;
+    private SootMethod godMethod = null;
+
     public String getDynamicClassesPath(String classPath, String dtsFileName) throws DtsZipUtilException {
         return ZipUtility.unzipDTSFile(dtsFileName) + File.separator + "dynamicCP";
+    }
+
+    private JimpleBody getGodJimpleBody() {
+        if (godJimpleBody == null) {
+            SootClass godClass = new SootClass("GodClass", Modifier.PUBLIC);
+            godClass.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+            Scene.v().addClass(godClass);
+
+            godMethod = new SootMethod("godMethod", Collections.emptyList(), VoidType.v(), Modifier.PUBLIC);
+            godClass.addMethod(godMethod);
+
+            godJimpleBody = Jimple.v().newBody(godMethod);
+            godMethod.setActiveBody(godJimpleBody);
+
+            return godJimpleBody;
+        } else {
+            return godJimpleBody;
+        }
+    }
+
+    private int associatedCallSiteCount = 0;
+    private Stmt getGodAssociatedStmt() {
+        SootClass godAssociatedCallSite = new SootClass("GodAssociatedCallSite", Modifier.PUBLIC);
+        godAssociatedCallSite.setSuperclass(Scene.v().getSootClass("java.lang.Object"));
+        Scene.v().addClass(godAssociatedCallSite);
+
+        SootMethod associatedGodMethod = new SootMethod("godAssociatedMethod" + associatedCallSiteCount++, Collections.emptyList(), VoidType.v(), Modifier.STATIC);
+        godAssociatedCallSite.addMethod(associatedGodMethod);
+
+        JimpleBody associatedGodJimpleBody = Jimple.v().newBody(associatedGodMethod);
+        associatedGodMethod.setActiveBody(associatedGodJimpleBody);
+
+        JStaticInvokeExpr jStaticInvokeExpr = new JStaticInvokeExpr(associatedGodMethod.makeRef(), Collections.emptyList());
+
+        return Jimple.v().newInvokeStmt(jStaticInvokeExpr);
     }
 
     /**
@@ -79,8 +122,35 @@ public class HybridCallGraph {
             for (DirectedEdge directedEdge : edgesInAGraph.getDirectedEdges()) {
                 //TODO: For now we left fake edges, consider in the future if want
 
-                // Leave the fake edges
-                if (!directedEdge.isFakeEdge()) {
+                if (directedEdge.isGodEdge()) {
+                    JimpleBody tempGodJimpleBody = getGodJimpleBody();
+
+                    SootMethod destination;
+
+                    try {
+                        destination = getMethod(directedEdge.getDestination());
+                    } catch (Exception | Error e) {
+                        continue;
+                    }
+
+                    if (!listOfAddedGodEdges.contains(destination.getSignature())) {
+                        Stmt stmt = getGodAssociatedStmt();
+                        tempGodJimpleBody.getUnits().add(stmt);
+                        Edge edge = new Edge(godMethod, stmt, destination);
+                        staticCallGraph.addEdge(edge);
+
+                        listOfAddedGodEdges.add(destination.getSignature());
+
+                        if (isDotGraphGenerate) {
+                            DotGraphEdge dotGraphEdge = dotGraph.drawEdge(godMethod.getSignature(), destination.getSignature());
+                            dotGraphEdge.setLabel(stmt.toString());
+                            dotGraphEdge.setAttribute("color", "purple");
+                        }
+
+                        ++numberOfDynamicEdgesAdded;
+                        ++numberOfGodEdges;
+                    }
+                } else if (!directedEdge.isFakeEdge()) {
                     SootMethod caller;
                     SootMethod destination;
 
@@ -112,10 +182,10 @@ public class HybridCallGraph {
                         }
 
                         if (!isEdgeFound) {
-                            if (isDotGraphGenerate) {
-                                Edge edge = new Edge(caller, associatedCallSiteUnit, destination);
+                            Edge edge = new Edge(caller, associatedCallSiteUnit, destination);
+                            staticCallGraph.addEdge(edge);
 
-                                staticCallGraph.addEdge(edge);
+                            if (isDotGraphGenerate) {
                                 DotGraphEdge dotGraphEdge = dotGraph.drawEdge(caller.getSignature(), destination.getSignature());
                                 dotGraphEdge.setLabel(associatedCallSiteUnit.toString());
                                 dotGraphEdge.setAttribute("color", "purple");
@@ -148,6 +218,7 @@ public class HybridCallGraph {
         hybridCGStats.setNumberOfEdgesInHybridCallGraph(numberOfEdgesInHybridCallGraph);
 
         hybridCGStats.setNumberOfFakeEdges(numberOfFakeEdges);
+        hybridCGStats.setNumberOfGodEdges(numberOfGodEdges);
     }
 
     /**
@@ -392,15 +463,9 @@ public class HybridCallGraph {
                     if (associatedCallSite.contains("(") && associatedCallSite.contains(")")) {
                         String temp = methodNameWithClassName + parametersTypes.toString();
 
-                        System.out.println("Built Signature = " + temp);
-                        System.out.println("Associated Call Site = " + associatedCallSite);
-                        System.out.println("Line Number = " + associatedCallSiteLineNumber);
-                        System.out.println("Original Signature = " + callSiteMethod.getSignature());
-
                         if (temp.equals(associatedCallSite)) {
                             if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
                                 if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
-                                    System.out.println("GOOD NEWS");
                                     statements.add(unit);
                                 }
                             } else {
@@ -410,7 +475,6 @@ public class HybridCallGraph {
                     } else if (methodNameWithClassName.equals(associatedCallSite)) {
                         if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
                             if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
-                                System.out.println("GOOD NEWS");
                                 statements.add(unit);
                             }
                         } else {
