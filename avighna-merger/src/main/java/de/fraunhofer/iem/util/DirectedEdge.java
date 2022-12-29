@@ -11,19 +11,22 @@ public class DirectedEdge implements Serializable {
     private int associatedCallSiteLineNumber;
     private boolean isFakeEdge;
     private boolean isCallSiteSameAsCaller;
+    private boolean isGodEdge;
 
     public DirectedEdge(String source,
                         String destination,
                         String associatedCallSite,
                         int associatedCallSiteLineNumber,
                         boolean isFakeEdge,
-                        boolean isCallSiteSameAsCaller) {
+                        boolean isCallSiteSameAsCaller,
+                        boolean isGodEdge) {
         this.source = source;
         this.destination = destination;
         this.associatedCallSite = associatedCallSite;
         this.associatedCallSiteLineNumber = associatedCallSiteLineNumber;
         this.isFakeEdge = isFakeEdge;
         this.isCallSiteSameAsCaller = isCallSiteSameAsCaller;
+        this.isGodEdge = isGodEdge;
     }
 
     public String getSource() {
@@ -74,6 +77,14 @@ public class DirectedEdge implements Serializable {
         isCallSiteSameAsCaller = callSiteSameAsCaller;
     }
 
+    public boolean isGodEdge() {
+        return isGodEdge;
+    }
+
+    public void setGodEdge(boolean godEdge) {
+        isGodEdge = godEdge;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -84,6 +95,7 @@ public class DirectedEdge implements Serializable {
         result = prime * result + Integer.hashCode(associatedCallSiteLineNumber);
         result = prime * result + Boolean.hashCode(isFakeEdge);
         result = prime * result + Boolean.hashCode(isCallSiteSameAsCaller);
+        result = prime * result + Boolean.hashCode(isGodEdge);
         return result;
     }
 
@@ -124,6 +136,9 @@ public class DirectedEdge implements Serializable {
         if (isFakeEdge != other.isFakeEdge())
             return false;
 
-        return isCallSiteSameAsCaller == other.isCallSiteSameAsCaller();
+        if (isCallSiteSameAsCaller != other.isCallSiteSameAsCaller())
+            return false;
+
+        return isGodEdge == other.isGodEdge();
     }
 }
