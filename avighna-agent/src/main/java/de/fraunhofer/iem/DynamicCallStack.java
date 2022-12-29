@@ -107,7 +107,7 @@ public class DynamicCallStack {
 
             // add a fake edge to represent the first call is from the spring boot framework
             String sourceNode = "framework.class: godMethod";
-            String associatedLibraryCall = "framework.class.getAssociatedCallSite";
+            String associatedLibraryCall = "framework.class.godAssociatedCallSite";
 
 
             DirectedEdge directedEdge = new DirectedEdge(
