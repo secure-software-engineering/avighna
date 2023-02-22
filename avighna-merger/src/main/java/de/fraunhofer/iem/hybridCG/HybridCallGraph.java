@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HybridCallGraph {
     private DotGraph dotGraph = null;
+    private DotGraph onlyAddedDotGraph = null;
     private DotGraph staticDotGraph = null;
     private HybridCGStats hybridCGStats = null;
 
@@ -112,6 +113,7 @@ public class HybridCallGraph {
         hybridCGStats.setPathToHybridCGDOTGraph("Not Available");
 
         dotGraph = new DotGraph("final:callgraph");
+        onlyAddedDotGraph = new DotGraph("final:newAddedCallgraph");
         staticDotGraph = new DotGraph("final:callgraph");
         // Generate the initial dot-graph from the static call-graph
         generateInitialDotGraph();
@@ -145,6 +147,10 @@ public class HybridCallGraph {
                             DotGraphEdge dotGraphEdge = dotGraph.drawEdge(godMethod.getSignature(), destination.getSignature());
                             dotGraphEdge.setLabel(stmt.toString());
                             dotGraphEdge.setAttribute("color", "purple");
+
+                            DotGraphEdge dotGraphEdge1 = onlyAddedDotGraph.drawEdge(godMethod.getSignature(), destination.getSignature());
+                            dotGraphEdge1.setLabel(stmt.toString());
+                            dotGraphEdge1.setAttribute("color", "purple");
                         }
 
                         ++numberOfDynamicEdgesAdded;
@@ -189,6 +195,10 @@ public class HybridCallGraph {
                                 DotGraphEdge dotGraphEdge = dotGraph.drawEdge(caller.getSignature(), destination.getSignature());
                                 dotGraphEdge.setLabel(associatedCallSiteUnit.toString());
                                 dotGraphEdge.setAttribute("color", "purple");
+
+                                DotGraphEdge dotGraphEdge1 = onlyAddedDotGraph.drawEdge(caller.getSignature(), destination.getSignature());
+                                dotGraphEdge1.setLabel(associatedCallSiteUnit.toString());
+                                dotGraphEdge1.setAttribute("color", "purple");
                             }
 
                             ++numberOfDynamicEdgesAdded;
@@ -260,8 +270,14 @@ public class HybridCallGraph {
 
         new File(statFile).delete();
 
+        System.out.println("Generating Image files");
         switch (imageType) {
             case SVG:
+                System.out.println(hybridCGStats.getPathToHybridCGDOTGraph().replace("_hybrid_cg", "_hybrid_cg_only"));
+                saveDotAsImageFile(
+                        hybridCGStats.getPathToHybridCGDOTGraph().replace("_hybrid_cg", "_hybrid_cg_only"),
+                        rootOutputDir + outputImageName + "_hybrid_cg_only.svg", Format.SVG);
+
                 saveDotAsImageFile(
                         hybridCGStats.getPathToStaticCGDOTGraph(),
                         rootOutputDir + outputImageName + "_static_cg.svg", Format.SVG);
@@ -330,6 +346,8 @@ public class HybridCallGraph {
         dotGraph.plot(rootOutputDir + outputDotFileName + "_hybrid_cg.dot");
         hybridCGStats.setPathToHybridCGDOTGraph(new File(rootOutputDir + outputDotFileName + "_hybrid_cg.dot").getAbsolutePath());
 
+        onlyAddedDotGraph.plot(rootOutputDir + outputDotFileName + "_hybrid_cg_only.dot");
+
         return YamlUtilClass.generateStatsFile(hybridCGStats, rootOutputDir);
     }
 
@@ -378,7 +396,7 @@ public class HybridCallGraph {
     private void saveDotAsImageFile(String dotFileName, String outputImageFileName, Format format) throws DotToImgException {
         try {
             GraphvizCmdLineEngine engine = new GraphvizCmdLineEngine();
-            engine.timeout(5, TimeUnit.MINUTES);
+            engine.timeout(15, TimeUnit.MINUTES);
             Graphviz.useEngine(engine);
             Graphviz.fromFile(new File(dotFileName)).render(format).toFile(new File(outputImageFileName));
         } catch (IOException e) {
