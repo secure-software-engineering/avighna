@@ -21,21 +21,6 @@ public class MainInterface {
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_GREEN = "\u001B[32m";
 
-    private static Process getCompleteCmd(String javaCmd) throws IOException {
-        String[] cmd;
-
-        if (OperatingSystemUtil.isMac()) {
-            String appleCMD = "tell app \"Terminal\"\n" +
-                    "do script \"" + javaCmd + "\"\n" +
-                    "end tell";
-            cmd = new String[]{"osascript", "-e", appleCMD};
-        } else {
-            cmd = new String[]{"cmd.exe", "/c", "cd . & start cmd.exe /c \"" + javaCmd + " & set /p dummy=Spring application terminated. Press enter.\""};
-        }
-
-        return Runtime.getRuntime().exec(cmd);
-    }
-
     private static void runApplicationWithJavaAgent(CommandLine commandLine) {
         LoggerUtil.getLOGGER().info("Running the provided application by attaching the avighna-agent. Below is the command.");
 
@@ -148,7 +133,14 @@ public class MainInterface {
             } else {
                 // This else block is for application that runs infinitely and user can send the requests through browser
 
-                Process process = getCompleteCmd(javaCMD.toString());
+                Process process = Runtime.getRuntime().exec(javaCmdArr);
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    LoggerUtil.getLOGGER().warning("Sleep Interrupted");
+                }
+
 
                 LoggerUtil.getLOGGER().info("Application is running by attaching the avighna-agent. " +
                         "If the application is web then, please open browser and run different requests");
