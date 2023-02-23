@@ -7,6 +7,7 @@ public class HybridCGStats {
     private int numberOfEdgesWithSameCallSiteMethod;
     private int numberOfEdgesWithDifferentCallSiteMethod;
     private int numberOfFakeEdges;
+    private int numberOfFakeEdgesFoundButNotAdded;
     private int numberOfGodEdges;
 
     private String pathToStaticCGDOTGraph;
@@ -60,6 +61,14 @@ public class HybridCGStats {
 
     public void setNumberOfFakeEdges(int numberOfFakeEdges) {
         this.numberOfFakeEdges = numberOfFakeEdges;
+    }
+
+    public int getNumberOfFakeEdgesFoundButNotAdded() {
+        return numberOfFakeEdgesFoundButNotAdded;
+    }
+
+    public void setNumberOfFakeEdgesFoundButNotAdded(int numberOfFakeEdgesFoundButNotAdded) {
+        this.numberOfFakeEdgesFoundButNotAdded = numberOfFakeEdgesFoundButNotAdded;
     }
 
     public int getNumberOfGodEdges() {
