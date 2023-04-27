@@ -1,4 +1,4 @@
-# Install Docker in your host machine
+# Install Avighna-Docker in your host machine
 
 # Build & Run Avighna Docker image
 - Unzip the avighna-docker-resource.zip
