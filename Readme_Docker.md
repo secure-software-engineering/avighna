@@ -1,5 +1,7 @@
 # Install Avighna-Docker in your host machine
 
+- Require docker for this artefact. To install docker in ubuntu follow the below link
+  https://phoenixnap.com/kb/install-docker-on-ubuntu-20-04
 # Build & Run Avighna Docker image
 - Unzip the avighna-docker-resource.zip
 
@@ -188,3 +190,25 @@ java -Xbootclasspath/p:avighna-agent-1.0.0.jar -javaagent:avighna-agent-1.0.0.ja
 - Once the application is up and running, in the terminal start typing some message and click enter. You can send any number of messages.
 - Once you are done using the guice application, type 'q' to exit.
 
+### To copy the output of the above Avighna commands
+
+- Get the avighna container id
+
+```shell script
+docker ps
+
+# Sample output is shown below. For the below container id is 3f57f1031cd3
+CONTAINER ID   IMAGE           COMMAND   CREATED         STATUS         PORTS                                                                                                                                                                        NAMES
+3f57f1031cd3   avighna-image   "bash"    9 minutes ago   Up 9 minutes   0.0.0.0:8081->8081/tcp, :::8081->8081/tcp, 0.0.0.0:9000->9000/tcp, :::9000->9000/tcp, 0.0.0.0:9411->9411/tcp, :::9411->9411/tcp, 0.0.0.0:9001->8080/tcp, :::9001->8080/tcp   avighna-container
+```
+
+- Copy the output from the container to the host machine to view the results.
+
+```shell script
+docker cp 3f57f1031cd3:/root/avighna/avighna-output .
+
+# The above is the sample command. The below is the format
+docker cp container-id:/root/avighna/avighna-output <path of the host machine where you want to copy the result>
+
+# /root/avighna/avighna-output is the directory where we store the avighna output because we used this directory as output directory in the avighna command while running.
+```
