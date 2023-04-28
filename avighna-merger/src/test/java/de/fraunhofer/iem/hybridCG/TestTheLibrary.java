@@ -5,17 +5,18 @@ import de.fraunhofer.iem.exception.DtsSerializeUtilException;
 import de.fraunhofer.iem.exception.UnexpectedError;
 import de.fraunhofer.iem.exception.DtsZipUtilException;
 import soot.*;
+import soot.jimple.toolkits.callgraph.CallGraph;
+import soot.jimple.toolkits.callgraph.Edge;
 import soot.options.Options;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.junit.Test;
+import soot.util.dot.DotGraph;
+import soot.util.dot.DotGraphEdge;
 
 /**
  * Test: check it generates valid hybrid call graph
@@ -41,16 +42,16 @@ public class TestTheLibrary {
 
         int option = -1;
 
-        option = new Scanner(System.in).nextInt();
+        option = 3;
 
         if (option == 1) { //Bean
             appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
             dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
             hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
         } else if (option == 2) { //Spring-Petclinic
-            appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\zipkin-server\\target\\classes";
-            dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
-            hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
+            appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/spring-petclinic/target/classes";
+            dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/spring-petclinic/avighnaOutput/dynamic_cg.dst";
+            hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/spring-petclinic/avighnaOutput/hybridMergerOutput/";
         } else if (option == 3) { //Fredbet
             appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/fredbet/target/classes";
             dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/fredbet/avighna-output/dynamic_cg.dst";
@@ -64,16 +65,20 @@ public class TestTheLibrary {
             dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\dynamic_cg.dst";
             hybridOutputPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\zipkin\\hybridCGOutput\\hybridMergerOutput\\";
         } else if (option == 6) { //Reflection Test Suite
-            appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/target/classes";
-            dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/avighna-output/dynamic_cg.dst";
-            hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/JavaReflectionTest/avighna-output/hybridMergerOutput/";
+            appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/Decapo/scratch/jar/";
+            dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/Decapo/avighna-output/dynamic_cg.dst";
+            hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Other-Projects/Decapo/avighna-output/hybridMergerOutput/";
         } else {
             System.exit(0);
         }
 
+        initializeSoot(appClassPath, null);
+
+        int initialEdges = generateInitialDotGraph();
+
         initializeSoot(appClassPath, dtsFileName);
 
-        new HybridCallGraph().merge(
+        new HybridCallGraph(true, initialEdges).merge(
                 dtsFileName,
                 Scene.v().getCallGraph(),
                 hybridOutputPath,
@@ -81,6 +86,32 @@ public class TestTheLibrary {
                 "callgraph",
                 ImageType.SVG
         );
+    }
+
+    private int generateInitialDotGraph() {
+        CallGraph callGraph = Scene.v().getCallGraph();
+
+        int numberOfEdgesInStaticCallGraph = 0;
+        DotGraph dotGraph = new DotGraph("final:callgraph");
+
+        for (Edge edge : callGraph) {
+            String node_src = edge.getSrc().toString();
+            String node_tgt = edge.getTgt().toString();
+
+            if (node_src.startsWith("<java.") || node_tgt.startsWith("<java.")) continue;
+
+            if (node_src.startsWith("<sun.") || node_tgt.startsWith("<sun.")) continue;
+
+            if (node_src.startsWith("<javax.") || node_tgt.startsWith("<javax.")) continue;
+
+            if (node_src.startsWith("<jdk.") || node_tgt.startsWith("<jdk.")) continue;
+
+            if (node_src.startsWith("<com.sun.crypto.provider.") || node_tgt.startsWith("<com.sun.crypto.provider.")) continue;
+
+            ++numberOfEdgesInStaticCallGraph;
+        }
+
+        return numberOfEdgesInStaticCallGraph;
     }
 
     /**
@@ -96,8 +127,15 @@ public class TestTheLibrary {
         Options.v().setPhaseOption("cg", "all-reachable:true");
         Options.v().set_allow_phantom_refs(true);
 
-        String dynamicCP = new HybridCallGraph().getDynamicClassesPath(appClassPath, dtsFileName);
-        Options.v().set_soot_classpath(appClassPath + File.pathSeparator + dynamicCP);
+        String dynamicCP = null;
+
+        if (dtsFileName == null) {
+            Options.v().set_soot_classpath(appClassPath + File.pathSeparator);
+        } else {
+            dynamicCP = new HybridCallGraph().getDynamicClassesPath(dtsFileName);
+            System.out.println();
+            Options.v().set_soot_classpath(appClassPath + File.pathSeparator + dynamicCP);
+        }
 
         Options.v().set_prepend_classpath(true);
         Options.v().set_whole_program(true);
@@ -110,8 +148,10 @@ public class TestTheLibrary {
 
         List<String> appClasses = new ArrayList<>(FilesUtils.getClassesAsList(appClassPath));
 
-        if (new File(dynamicCP).exists()) {
-            appClasses.addAll(new ArrayList<>(FilesUtils.getClassesAsList(dynamicCP)));
+        if (dtsFileName != null) {
+            if (new File(dynamicCP).exists()) {
+                appClasses.addAll(new ArrayList<>(FilesUtils.getClassesAsList(dynamicCP)));
+            }
         }
 
         List<SootMethod> entries = new ArrayList<SootMethod>();
