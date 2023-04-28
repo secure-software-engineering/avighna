@@ -153,11 +153,11 @@ public class HybridCallGraph {
                         if (isDotGraphGenerate) {
                             DotGraphEdge dotGraphEdge = dotGraph.drawEdge(godMethod.getSignature(), destination.getSignature());
                             dotGraphEdge.setLabel(stmt.toString());
-                            dotGraphEdge.setAttribute("color", "purple");
+                            dotGraphEdge.setAttribute("color", "red");
 
                             DotGraphEdge dotGraphEdge1 = onlyAddedDotGraph.drawEdge(godMethod.getSignature(), destination.getSignature());
                             dotGraphEdge1.setLabel(stmt.toString());
-                            dotGraphEdge1.setAttribute("color", "purple");
+                            dotGraphEdge1.setAttribute("color", "red");
                         }
 
                         ++numberOfDynamicEdgesAdded;
@@ -199,13 +199,21 @@ public class HybridCallGraph {
                             staticCallGraph.addEdge(edge);
 
                             if (isDotGraphGenerate) {
+                                String colorCode = "";
+
+                                if (directedEdge.isCallSiteSameAsCaller()) {
+                                    colorCode = "purple";
+                                } else {
+                                    colorCode = "blue";
+                                }
+
                                 DotGraphEdge dotGraphEdge = dotGraph.drawEdge(caller.getSignature(), destination.getSignature());
                                 dotGraphEdge.setLabel(associatedCallSiteUnit.toString());
-                                dotGraphEdge.setAttribute("color", "purple");
+                                dotGraphEdge.setAttribute("color", colorCode);
 
                                 DotGraphEdge dotGraphEdge1 = onlyAddedDotGraph.drawEdge(caller.getSignature(), destination.getSignature());
                                 dotGraphEdge1.setLabel(associatedCallSiteUnit.toString());
-                                dotGraphEdge1.setAttribute("color", "purple");
+                                dotGraphEdge1.setAttribute("color", colorCode);
                             }
 
                             ++numberOfDynamicEdgesAdded;
