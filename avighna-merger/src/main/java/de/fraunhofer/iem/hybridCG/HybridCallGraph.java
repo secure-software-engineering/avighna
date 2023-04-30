@@ -443,13 +443,27 @@ public class HybridCallGraph {
 
             DotGraphEdge dotGraphEdge = dotGraph.drawEdge(node_src, node_tgt);
             DotGraphEdge staticDotGraphEdge = staticDotGraph.drawEdge(node_src, node_tgt);
+            DotGraphEdge onlyAddedDotGraphEdge = onlyAddedDotGraph.drawEdge(node_src, node_tgt);
+
+            if (node_src.contains("$") || node_tgt.contains("$")) {
+                dotGraphEdge.setAttribute("color", "grey");
+                dotGraphEdge.setStyle("dashed");
+
+                staticDotGraphEdge.setAttribute("color", "grey");
+                staticDotGraphEdge.setStyle("dashed");
+
+                onlyAddedDotGraphEdge.setAttribute("color", "grey");
+                onlyAddedDotGraphEdge.setStyle("dashed");
+            }
 
             if (edge.srcStmt() == null) {
                 dotGraphEdge.setLabel("null");
                 staticDotGraphEdge.setLabel("null");
+                onlyAddedDotGraphEdge.setLabel("null");
             } else {
                 dotGraphEdge.setLabel(edge.srcUnit().toString());
                 staticDotGraphEdge.setLabel(edge.srcUnit().toString());
+                onlyAddedDotGraphEdge.setLabel(edge.srcUnit().toString());
             }
 
 
