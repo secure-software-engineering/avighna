@@ -73,6 +73,21 @@ public class MainInterface {
                 LoggerUtil.getLOGGER().info("Spring application is up and running with the provided agent. " +
                         "Sending the provided requests");
 
+                int exitCode = 0;
+                int connectionTry = 0;
+
+                do {
+                    if (connectionTry != 500) {
+                        Process testProcess = Runtime.getRuntime().exec(requestFile.getRequests().get(0).getCurlCmd());
+                        testProcess.waitFor();
+                        exitCode = testProcess.exitValue();
+                        connectionTry++;
+                    } else {
+                        LoggerUtil.getLOGGER().severe("Unable to send the request because the server is not running");
+                        System.exit(-1);
+                    }
+                } while (exitCode == 7);
+
                 // Start sending the requests
                 for (CurlCmd curlCmd : requestFile.getRequests()) {
                     try {
