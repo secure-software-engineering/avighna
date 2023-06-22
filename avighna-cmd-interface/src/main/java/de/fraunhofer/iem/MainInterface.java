@@ -98,6 +98,7 @@ public class MainInterface {
                         // wait for the curl command to finish
                         pr.waitFor();
 
+                        System.out.println(pr.exitValue());
                         // Sleep for sometime before move on to next curl command
                         Thread.sleep(3000);
                     } catch (IOException | InterruptedException e) {
