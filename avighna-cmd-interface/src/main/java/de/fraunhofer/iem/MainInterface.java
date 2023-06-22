@@ -88,6 +88,7 @@ public class MainInterface {
                     }
                 } while (exitCode == 7);
 
+                LoggerUtil.getLOGGER().info("Successfully connected to server. Sending the requests now.");
                 // Start sending the requests
                 for (CurlCmd curlCmd : requestFile.getRequests()) {
                     try {
