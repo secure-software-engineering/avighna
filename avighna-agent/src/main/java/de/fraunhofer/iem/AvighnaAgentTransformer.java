@@ -80,12 +80,17 @@ public class AvighnaAgentTransformer implements ClassFileTransformer {
         return Descriptor.toString(methodDesc);
     }
 
-    private boolean isFakeEdge(String methodSignature) {
-        if (methodSignature.contains("$"))
-            return true;
+    private boolean isFakeEdge(String className) {
+        if (className.contains("$")) {
+            for (String rootPackage : this.rootPackageNameOfApplication) {
+                if (className.startsWith(rootPackage)) {
+                    return true;
+                }
+            }
+        }
 
         for (String fakeEdge : fakeEdges) {
-            if (methodSignature.contains(fakeEdge)) {
+            if (className.contains(fakeEdge)) {
                 return true;
             }
         }
