@@ -53,9 +53,9 @@ public class TestTheLibrary {
             dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/spring-petclinic/avighnaOutput/dynamic_cg.dst";
             hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/spring-petclinic/avighnaOutput/hybridMergerOutput/";
         } else if (option == 3) { //Fredbet
-            appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/fredbet/target/classes";
-            dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/fredbet/avighna-output/dynamic_cg.dst";
-            hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/fredbet/avighna-output/hybridMergerOutput/";
+            appClassPath = "C:\\Work\\avighna\\spring-petclinic\\target\\classes";
+            dtsFileName = "C:\\Work\\avighna\\avighna-output\\Spring-Projects\\spring-petclinic\\avighna-agent-output\\dynamic_cg.dst";
+            hybridOutputPath = "C:\\Work\\avighna\\avighna-output\\Spring-Projects\\spring-petclinic\\avighna-agent-output\\hybridMergerOutput";
         } else if (option == 4) { //Spring Initializer Website
             appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\start-site\\target\\classes";
             dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\hybridCGOutput\\dynamic_cg.dst";

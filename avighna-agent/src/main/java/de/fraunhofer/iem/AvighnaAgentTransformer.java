@@ -91,7 +91,11 @@ public class AvighnaAgentTransformer implements ClassFileTransformer {
 
         for (String fakeEdge : fakeEdges) {
             if (className.contains(fakeEdge)) {
-                return true;
+                for (String rootPackage : this.rootPackageNameOfApplication) {
+                    if (className.startsWith(rootPackage)) {
+                        return true;
+                    }
+                }
             }
         }
 

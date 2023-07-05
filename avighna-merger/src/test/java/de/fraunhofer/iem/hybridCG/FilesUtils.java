@@ -25,14 +25,15 @@ public class FilesUtils {
 
         List<String> appClasses = new ArrayList<>();
 
+        System.out.println(File.separator);
         try {
             Files.find(path,
                     Integer.MAX_VALUE,
                     (filePath, fileAttr) -> filePath.toString().endsWith(".class") && fileAttr.isRegularFile()
             ).forEach(p -> appClasses.add(p.toString()
                     .replace(path.toString(), "")
-                    .replaceAll(File.separator, ".")
-                    .replaceAll("^\\.", "")
+                    .replaceAll("^\\\\", "")
+                    .replaceAll("\\\\", ".")
                     .replaceAll("\\.class$", "")));
         } catch (IOException e) {
             System.err.println("Something went wrong!\nStacktrace: \n");
