@@ -454,6 +454,12 @@ public class HybridCallGraph {
 
                 onlyAddedDotGraphEdge.setAttribute("color", "grey");
                 onlyAddedDotGraphEdge.setStyle("dashed");
+
+                if (edge.srcStmt() == null) {
+                    onlyAddedDotGraphEdge.setLabel("null");
+                } else {
+                    onlyAddedDotGraphEdge.setLabel(edge.srcUnit().toString());
+                }
             }
 
             if (edge.srcStmt() == null) {
