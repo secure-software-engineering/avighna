@@ -459,11 +459,9 @@ public class HybridCallGraph {
             if (edge.srcStmt() == null) {
                 dotGraphEdge.setLabel("null");
                 staticDotGraphEdge.setLabel("null");
-                onlyAddedDotGraphEdge.setLabel("null");
             } else {
                 dotGraphEdge.setLabel(edge.srcUnit().toString());
                 staticDotGraphEdge.setLabel(edge.srcUnit().toString());
-                onlyAddedDotGraphEdge.setLabel(edge.srcUnit().toString());
             }
 
 
