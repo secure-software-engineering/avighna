@@ -443,9 +443,9 @@ public class HybridCallGraph {
 
             DotGraphEdge dotGraphEdge = dotGraph.drawEdge(node_src, node_tgt);
             DotGraphEdge staticDotGraphEdge = staticDotGraph.drawEdge(node_src, node_tgt);
-            DotGraphEdge onlyAddedDotGraphEdge = onlyAddedDotGraph.drawEdge(node_src, node_tgt);
 
             if (node_src.contains("$") || node_tgt.contains("$")) {
+                DotGraphEdge onlyAddedDotGraphEdge = onlyAddedDotGraph.drawEdge(node_src, node_tgt);
                 dotGraphEdge.setAttribute("color", "grey");
                 dotGraphEdge.setStyle("dashed");
 
