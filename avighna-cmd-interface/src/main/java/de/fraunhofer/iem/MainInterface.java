@@ -28,7 +28,7 @@ public class MainInterface {
             ArrayList<String> cmd = new ArrayList<>();
 
             cmd.add("java");
-            cmd.add("-Xbootclasspath/p:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG));
+            cmd.add("-Xbootclasspath/a:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG));
             cmd.add("-javaagent:" + commandLine.getOptionValue(CommandLineUtility.DYNAMIC_CG_GEN_LONG) + "=" + agentSettingFile);
             cmd.add("-noverify");
             cmd.add("-jar");
