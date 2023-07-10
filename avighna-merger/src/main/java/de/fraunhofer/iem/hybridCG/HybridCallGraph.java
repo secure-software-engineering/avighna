@@ -538,27 +538,34 @@ public class HybridCallGraph {
                             String associatedClassName = associatedCallSite.substring(0, associatedCallSite.lastIndexOf("."));
 
                             SootClass associatedClass = Scene.v().forceResolve(associatedClassName, SootClass.BODIES);
-                            String temp1 = associatedCallSite.replace(associatedClass.getName(), associatedClass.getSuperclass().getName());
 
-                            if (temp.equals(temp1)) {
-                                if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
-                                    if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
+                            if (associatedClass != null) {
+                                String temp1 = "NA";
+
+                                if (associatedClass.getSuperclass() != null) {
+                                    temp1 = associatedCallSite.replace(associatedClass.getName(), associatedClass.getSuperclass().getName());
+                                }
+
+                                if (temp.equals(temp1)) {
+                                    if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
+                                        if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
+                                            statements.add(unit);
+                                        }
+                                    } else {
                                         statements.add(unit);
                                     }
                                 } else {
-                                    statements.add(unit);
-                                }
-                            } else {
-                                for (SootClass implementedInterface : associatedClass.getInterfaces()) {
-                                    String temp2 = associatedCallSite.replace(associatedClass.getName(), implementedInterface.getName());
+                                    for (SootClass implementedInterface : associatedClass.getInterfaces()) {
+                                        String temp2 = associatedCallSite.replace(associatedClass.getName(), implementedInterface.getName());
 
-                                    if (temp.equals(temp2)) {
-                                        if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
-                                            if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
+                                        if (temp.equals(temp2)) {
+                                            if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
+                                                if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
+                                                    statements.add(unit);
+                                                }
+                                            } else {
                                                 statements.add(unit);
                                             }
-                                        } else {
-                                            statements.add(unit);
                                         }
                                     }
                                 }
