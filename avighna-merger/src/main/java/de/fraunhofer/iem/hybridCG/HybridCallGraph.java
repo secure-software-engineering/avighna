@@ -493,6 +493,9 @@ public class HybridCallGraph {
     private List<Stmt> getAssociatedCallSiteUnit(SootMethod caller, String associatedCallSite, int associatedCallSiteLineNumber) {
         ArrayList<Stmt> statements = new ArrayList<>();
 
+        associatedCallSite = associatedCallSite.split(": ")[0] +
+                "." + associatedCallSite.split(": ")[1].split(" ")[1];
+
         if (caller.hasActiveBody()) {
             Body body = caller.getActiveBody();
 
@@ -528,6 +531,35 @@ public class HybridCallGraph {
                                 }
                             } else {
                                 statements.add(unit);
+                            }
+                        } else {
+                            String associatedClassName = associatedCallSite.substring(0, associatedCallSite.lastIndexOf("."));
+
+                            SootClass associatedClass = Scene.v().forceResolve(associatedClassName, SootClass.BODIES);
+                            String temp1 = associatedCallSite.replace(associatedClass.getName(), associatedClass.getSuperclass().getName());
+
+                            if (temp.equals(temp1)) {
+                                if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
+                                    if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
+                                        statements.add(unit);
+                                    }
+                                } else {
+                                    statements.add(unit);
+                                }
+                            } else {
+                                for (SootClass implementedInterface : associatedClass.getInterfaces()) {
+                                    String temp2 = associatedCallSite.replace(associatedClass.getName(), implementedInterface.getName());
+
+                                    if (temp.equals(temp2)) {
+                                        if (associatedCallSiteLineNumber > 0 && unit.getJavaSourceStartLineNumber() > 0) {
+                                            if (associatedCallSiteLineNumber == unit.getJavaSourceStartLineNumber()) {
+                                                statements.add(unit);
+                                            }
+                                        } else {
+                                            statements.add(unit);
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else if (methodNameWithClassName.equals(associatedCallSite)) {
