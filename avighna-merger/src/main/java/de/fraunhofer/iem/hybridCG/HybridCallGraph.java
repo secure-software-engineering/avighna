@@ -493,8 +493,10 @@ public class HybridCallGraph {
     private List<Stmt> getAssociatedCallSiteUnit(SootMethod caller, String associatedCallSite, int associatedCallSiteLineNumber) {
         ArrayList<Stmt> statements = new ArrayList<>();
 
-        associatedCallSite = associatedCallSite.split(": ")[0] +
-                "." + associatedCallSite.split(": ")[1].split(" ")[1];
+        if (associatedCallSite.contains(":")) {
+            associatedCallSite = associatedCallSite.split(": ")[0] +
+                    "." + associatedCallSite.split(": ")[1].split(" ")[1];
+        }
 
         if (caller.hasActiveBody()) {
             Body body = caller.getActiveBody();

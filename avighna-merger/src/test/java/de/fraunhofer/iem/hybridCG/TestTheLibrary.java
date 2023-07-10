@@ -53,9 +53,9 @@ public class TestTheLibrary {
             dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/spring-petclinic/avighnaOutput/dynamic_cg.dst";
             hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Spring-Projects/spring-petclinic/avighnaOutput/hybridMergerOutput/";
         } else if (option == 3) { //Fredbet
-            appClassPath = "C:\\Work\\avighna\\spring-petclinic\\target\\classes";
-            dtsFileName = "C:\\Work\\avighna\\avighna-output\\Spring-Projects\\spring-petclinic\\avighna-agent-output\\dynamic_cg.dst";
-            hybridOutputPath = "C:\\Work\\avighna\\avighna-output\\Spring-Projects\\spring-petclinic\\avighna-agent-output\\hybridMergerOutput";
+            appClassPath = "/Volumes/Ranjith/Work/Avighna-Project/avighna-docker-resource/JavaReflectionTestCases/TR7/target/classes";
+            dtsFileName = "/Volumes/Ranjith/Work/Avighna-Project/Avighna-Artefact-Script/Avighna-Artefact-Script/avighna-output/Reflection-Projects/JavaReflectionTestCases/TR7/avighna-agent-output/dynamic_cg.dst";
+            hybridOutputPath = "/Volumes/Ranjith/Work/Avighna-Project/Avighna-Artefact-Script/Avighna-Artefact-Script/avighna-output/Reflection-Projects/JavaReflectionTestCases/TR7/avighna-agent-output/hybrid-merger-output/";
         } else if (option == 4) { //Spring Initializer Website
             appClassPath = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\start-site\\target\\classes";
             dtsFileName = "D:\\Work\\HybridCG\\temp\\Spring_Projects\\start.spring.io\\hybridCGOutput\\dynamic_cg.dst";
@@ -156,7 +156,7 @@ public class TestTheLibrary {
 
         List<SootMethod> entries = new ArrayList<SootMethod>();
         for (String appClass : appClasses) {
-            System.out.println(appClass);
+            System.out.println("App class = " + appClass);
             SootClass sootClass = Scene.v().forceResolve(appClass, SootClass.BODIES);
             sootClass.setApplicationClass();
             entries.addAll(sootClass.getMethods());

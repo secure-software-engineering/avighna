@@ -32,8 +32,8 @@ public class FilesUtils {
                     (filePath, fileAttr) -> filePath.toString().endsWith(".class") && fileAttr.isRegularFile()
             ).forEach(p -> appClasses.add(p.toString()
                     .replace(path.toString(), "")
-                    .replaceAll("^\\\\", "")
-                    .replaceAll("\\\\", ".")
+                    .replaceAll("^/", "")
+                    .replaceAll("/", ".")
                     .replaceAll("\\.class$", "")));
         } catch (IOException e) {
             System.err.println("Something went wrong!\nStacktrace: \n");
