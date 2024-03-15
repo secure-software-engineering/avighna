@@ -1,9 +1,11 @@
 package de.fraunhofer.iem.hybridCG;
 
-import de.fraunhofer.iem.exception.DotToImgException;
-import de.fraunhofer.iem.exception.DtsSerializeUtilException;
-import de.fraunhofer.iem.exception.UnexpectedError;
-import de.fraunhofer.iem.exception.DtsZipUtilException;
+import de.fraunhofer.iem.avighna.hybridCG.HybridCallGraph;
+import de.fraunhofer.iem.avighna.hybridCG.ImageType;
+import de.fraunhofer.iem.avighna.exception.DotToImgException;
+import de.fraunhofer.iem.avighna.exception.DtsSerializeUtilException;
+import de.fraunhofer.iem.avighna.exception.UnexpectedError;
+import de.fraunhofer.iem.avighna.exception.DtsZipUtilException;
 import soot.*;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
@@ -16,7 +18,6 @@ import java.util.List;
 
 import org.junit.Test;
 import soot.util.dot.DotGraph;
-import soot.util.dot.DotGraphEdge;
 
 /**
  * Test: check it generates valid hybrid call graph

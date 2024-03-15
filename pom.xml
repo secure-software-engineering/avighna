@@ -6,13 +6,13 @@
 
     <groupId>de.fraunhofer.iem</groupId>
     <artifactId>avighna</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <soot-version>4.3.0-SNAPSHOT</soot-version>
+        <soot-version>4.3.0</soot-version>
         <java-assist-version>3.28.0-GA</java-assist-version>
         <current-version>1.0-SNAPSHOT</current-version>
         <yaml-version>1.28</yaml-version>
